@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@plugin "@tailwindcss/typography";
 
 @source "../Views/**/*.cshtml";
 @source "../Views/**/*.razor";
@@ -254,6 +255,10 @@
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow-raised);
     padding: var(--space-300);
+  }
+
+  .content-prose {
+    max-width: var(--layout-width-reading);
   }
 
   .button-primary {

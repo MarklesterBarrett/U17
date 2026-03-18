@@ -1,13 +1,14 @@
 @inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockListItem>
 @{
     var content = Model.Content;
-    var rte = content.Value("rte");
-    if (rte is null)
+    var text = content.Value("rte")
+        ?? content.Value("text");
+    if (text is null)
     {
         return;
     }
 }
 
 <section class="prose prose-neutral content-prose max-w-none">
-    @rte
+    @text
 </section>
