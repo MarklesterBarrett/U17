@@ -1,0 +1,14 @@
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockListItem>
+@{
+    var content = Model.Content;
+    var body = content.Value<IHtmlEncodedString>("bodyText")
+        ?? content.Value<IHtmlEncodedString>("text")
+        ?? content.Value<IHtmlEncodedString>("content");
+}
+
+@if (body != null)
+{
+    <section class="content-section content-panel">
+        @body
+    </section>
+}

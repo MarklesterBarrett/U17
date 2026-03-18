@@ -2,12 +2,23 @@
 @{
     if (Model?.Any() != true) { return; }
 }
-<div class="umb-block-list">
+<div class="block-flow">
     @foreach (var block in Model)
     {
         if (block?.ContentKey == null) { continue; }
         var data = block.Content;
-
-        @await Html.PartialAsync("blocklist/Components/" + data.ContentType.Alias, block)
+        var partialViewName = "~/Views/Partials/Blocks/" + data.ContentType.Alias + ".cshtml";
+        try
+        {
+            @await Html.PartialAsync(partialViewName, block)
+        }
+        catch (InvalidOperationException)
+        {
+            <section class="content-section content-panel">
+                <p>
+                    Missing block partial for <strong>@data.ContentType.Alias</strong>.
+                </p>
+            </section>
+        }
     }
 </div>

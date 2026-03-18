@@ -1,0 +1,46 @@
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<IPublishedContent>
+@using Umbraco.Cms.Core.Models.Blocks
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    var pageTitle = Model.Value<string>("pageTitle");
+    if (string.IsNullOrWhiteSpace(pageTitle))
+    {
+        pageTitle = Model.Name;
+    }
+
+    var pageSummary = Model.Value<string>("pageSummary")
+        ?? Model.Value<string>("summary")
+        ?? Model.Value<string>("intro");
+
+    var blocks = Model.Value<BlockListModel>("blocks")
+        ?? Model.Value<BlockListModel>("contentBlocks")
+        ?? Model.Value<BlockListModel>("bodyBlocks");
+
+    ViewData["Title"] = pageTitle;
+}
+
+<div class="site-container">
+    <div class="page-stack">
+        <section class="page-intro">
+            <h1 class="page-title">@pageTitle</h1>
+            @if (!string.IsNullOrWhiteSpace(pageSummary))
+            {
+                <p class="page-meta">@pageSummary</p>
+            }
+        </section>
+
+        @if (blocks?.Any() == true)
+        {
+            <div class="block-flow">
+                @await Html.PartialAsync("~/Views/Partials/blocklist/default.cshtml", blocks)
+            </div>
+        }
+        else
+        {
+            <section class="content-section content-panel">
+                <p>No content blocks are configured for this page yet.</p>
+            </section>
+        }
+    </div>
+</div>

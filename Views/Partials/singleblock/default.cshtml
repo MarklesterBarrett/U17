@@ -4,6 +4,6 @@
     var data = Model.Content;
 }
 @await Html.PartialAsync(
-    Html.SingleBlockPartialWithFallback("singleBlock/Components/" + data.ContentType.Alias,
-        "blocklist/Components/" + data.ContentType.Alias )
+    Html.SingleBlockPartialWithFallback("Blocks/" + data.ContentType.Alias,
+        "Blocks/" + data.ContentType.Alias )
     , Model)

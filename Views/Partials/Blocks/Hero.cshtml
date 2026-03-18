@@ -1,0 +1,21 @@
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockListItem>
+@{
+    var content = Model.Content;
+    var heading = content.Value<string>("heading") ?? content.Name;
+    var summary = content.Value<string>("summary") ?? content.Value<string>("text");
+    var ctaLabel = content.Value<string>("ctaLabel");
+    var ctaLink = content.Value<Umbraco.Cms.Core.Models.Link>("ctaLink");
+}
+
+<section class="content-section content-panel">
+    <h2>@heading</h2>
+    @if (!string.IsNullOrWhiteSpace(summary))
+    {
+        <p>@summary</p>
+    }
+
+    @if (ctaLink != null && !string.IsNullOrWhiteSpace(ctaLabel))
+    {
+        <a class="button-primary" href="@ctaLink.Url" target="@ctaLink.Target">@ctaLabel</a>
+    }
+</section>

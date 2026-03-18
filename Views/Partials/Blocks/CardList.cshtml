@@ -1,0 +1,29 @@
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockListItem>
+@using Umbraco.Cms.Core.Models.Blocks
+@{
+    var content = Model.Content;
+    var heading = content.Value<string>("heading") ?? content.Name;
+    var items = content.Value<BlockListModel>("items")
+        ?? content.Value<BlockListModel>("cards");
+}
+
+<section class="content-section">
+    <h2>@heading</h2>
+    @if (items?.Any() == true)
+    {
+        <div class="card-list">
+            @foreach (var item in items)
+            {
+                var itemHeading = item.Content.Value<string>("heading") ?? item.Content.Name;
+                var itemText = item.Content.Value<string>("text") ?? item.Content.Value<string>("summary");
+                <article class="content-panel content-section">
+                    <h3>@itemHeading</h3>
+                    @if (!string.IsNullOrWhiteSpace(itemText))
+                    {
+                        <p>@itemText</p>
+                    }
+                </article>
+            }
+        </div>
+    }
+</section>
