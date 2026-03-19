@@ -2,7 +2,7 @@
 @{
     if (Model?.Any() != true) { return; }
 }
-<div class="block-flow">
+<div class="grid gap-8">
     @foreach (var block in Model)
     {
         if (block?.ContentKey == null) { continue; }
@@ -14,7 +14,7 @@
         }
         catch (InvalidOperationException)
         {
-            <section class="content-section content-panel">
+            <section class="grid gap-4 rounded-card border border-border-subtle bg-panel p-6 shadow-card">
                 <p>
                     Missing block partial for <strong>@data.ContentType.Alias</strong>.
                 </p>

@@ -7,7 +7,7 @@
         ?? content.Value<BlockListModel>("cards");
 }
 
-<section class="content-section">
+<section class="grid gap-4">
     <h2>@heading</h2>
     @if (items?.Any() == true)
     {
@@ -16,7 +16,7 @@
             {
                 var itemHeading = item.Content.Value<string>("heading") ?? item.Content.Name;
                 var itemText = item.Content.Value<string>("text") ?? item.Content.Value<string>("summary");
-                <article class="content-panel content-section">
+                <article class="grid gap-4 rounded-card border border-border-subtle bg-panel p-6 shadow-card">
                     <h3>@itemHeading</h3>
                     @if (!string.IsNullOrWhiteSpace(itemText))
                     {

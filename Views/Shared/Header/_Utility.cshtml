@@ -1,0 +1,32 @@
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<IEnumerable<Umbraco.Cms.Core.Models.Blocks.BlockListItem>>
+@using Umbraco.Cms.Core.Models
+@using Umbraco.Cms.Core.Models.Blocks
+@{
+    var blocks = Model ?? Enumerable.Empty<BlockListItem>();
+}
+
+@if (blocks.Any())
+{
+    <div class="border-b border-border-subtle bg-panel-muted">
+        <div class="mx-auto grid min-h-10 w-full max-w-[var(--layout-width-content)] items-center justify-items-end px-gutter py-2">
+            <nav aria-label="Utility navigation" class="grid grid-flow-col gap-4 text-sm text-text-muted">
+                @foreach (var block in blocks)
+                {
+                    var content = block.Content;
+                    var link = content.Value<Link>("link")
+                        ?? content.Value<IEnumerable<Link>>("link")?.FirstOrDefault();
+
+                    if (link is null)
+                    {
+                        continue;
+                    }
+
+                    var linkUrl = link.Url?.ToString() ?? "#";
+                    var linkTarget = link.Target?.ToString();
+                    var linkName = string.IsNullOrWhiteSpace(link.Name) ? linkUrl : link.Name;
+                    <a href="@linkUrl" target="@linkTarget">@linkName</a>
+                }
+            </nav>
+        </div>
+    </div>
+}

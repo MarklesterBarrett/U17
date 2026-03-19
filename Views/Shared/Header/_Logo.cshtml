@@ -1,0 +1,26 @@
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<dynamic>
+@{
+    var siteName = (string)Model.SiteName;
+    var siteLogo = (IPublishedContent?)Model.SiteLogo;
+    var logoFile = siteLogo?.Value<string>("umbracoFile");
+    var logoAlt = !string.IsNullOrWhiteSpace(siteName) ? siteName : System.IO.Path.GetFileNameWithoutExtension(logoFile) ?? "Site";
+    var logoUrl = siteLogo?.Url();
+    var logoWidth = siteLogo?.Value<int>("umbracoWidth");
+    var logoHeight = siteLogo?.Value<int>("umbracoHeight");
+}
+
+<a class="grid justify-self-start text-text-strong no-underline" href="/">
+    @if (siteLogo != null)
+    {
+        <img
+            alt="@logoAlt"
+            class="h-8 w-auto max-w-40"
+            src="@logoUrl"
+            width="@logoWidth"
+            height="@logoHeight" />
+    }
+    else
+    {
+        <span class="font-display text-xl font-bold">@siteName</span>
+    }
+</a>

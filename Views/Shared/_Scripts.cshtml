@@ -1,0 +1,17 @@
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
+<script>
+    (() => {
+        const toggle = document.querySelector("[data-nav-toggle]");
+        const navigation = document.getElementById("site-main-navigation");
+
+        if (!toggle || !navigation) {
+            return;
+        }
+
+        toggle.addEventListener("click", () => {
+            const expanded = toggle.getAttribute("aria-expanded") === "true";
+            toggle.setAttribute("aria-expanded", (!expanded).toString());
+            navigation.classList.toggle("hidden", expanded);
+        });
+    })();
+</script>

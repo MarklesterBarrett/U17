@@ -8,11 +8,12 @@
     <link rel="icon" type="image/x-icon" href="~/favicon.ico" />
     <link rel="stylesheet" href="~/css/site.css" />
 </head>
-<body class="site-shell">
-    @await Html.PartialAsync("~/Views/Shared/_Header.cshtml")
-    <main id="main-content" class="site-main">
+<body class="min-h-screen bg-page text-text-default">
+    @await Html.PartialAsync("~/Views/Shared/Header/_Index.cshtml")
+    <main id="main-content" class="py-8 lg:py-section">
         @RenderBody()
     </main>
     @await Html.PartialAsync("~/Views/Shared/_Footer.cshtml")
+    @await Html.PartialAsync("~/Views/Shared/_Scripts.cshtml")
 </body>
 </html>

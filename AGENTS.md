@@ -33,6 +33,7 @@ This repository is an Umbraco website built with plain cshtml views and Tailwind
 - Prefer token reuse over new token creation
 - Use utility classes first, component extraction second
 - Avoid custom CSS unless Tailwind or tokens cannot express the requirement cleanly
+- support for 320px baseline phones, from 768px tablet, and 1024 laptop, 1440 desktop.
 
 ## Design-token goal
 

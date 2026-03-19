@@ -2,33 +2,19 @@
 @using Umbraco.Cms.Core.Models.Blocks
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
-
-    var pageTitle = Model.Name;
-    var pageSummary = Model.Value<string>("summaryContent");
-    var blocks = Model.Value<BlockListModel>("blocks");
-
-    ViewData["Title"] = pageTitle;
+    var blocks = Model?.Value<IEnumerable<BlockListItem>>("blocks") ?? Enumerable.Empty<BlockListItem>();
 }
 
-<div class="site-container">
-    <div class="page-stack">
-        <section class="page-intro">
-            <h1 class="page-title">@pageTitle</h1>
-            @if (!string.IsNullOrWhiteSpace(pageSummary))
-            {
-                <p class="page-meta">@pageSummary</p>
-            }
-        </section>
+<div class="mx-auto grid w-full max-w-[var(--layout-width-content)] gap-8 px-gutter">
 
-        @if (blocks?.Any() == true)
-        {
-            @await Html.PartialAsync("~/Views/Partials/blocklist/default.cshtml", blocks)
-        }
-        else
-        {
-            <section class="content-section content-panel">
-                <p>No content blocks are configured for this page yet.</p>
-            </section>
-        }
-    </div>
+    @if (blocks?.Any() == true)
+    {
+        @await Html.PartialAsync("~/Views/Partials/blocklist/default.cshtml", blocks)
+    }
+    else
+    {
+        <section class="grid gap-4 rounded-card border border-border-subtle bg-panel p-6 shadow-card">
+            <p>No content blocks are configured for this page yet.</p>
+        </section>
+    }
 </div>
