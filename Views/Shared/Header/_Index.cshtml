@@ -5,8 +5,8 @@
     var siteSettings = Umbraco.ContentAtRoot().FirstOrDefault(x => x.ContentType.Alias == "siteSettings");
     var siteName = siteSettings?.Value<string>("siteName") ?? "Site";
     var siteLogo = siteSettings?.Value<IPublishedContent>("siteLogo");
-    var utilityNavigation = siteSettings?.Value<IEnumerable<BlockListItem>>("utilityNavigation") ?? Enumerable.Empty<BlockListItem>();
-    var mainNavigation = siteSettings?.Value<IEnumerable<BlockListItem>>("mainNavigation") ?? Enumerable.Empty<BlockListItem>();
+    var utilityNavigation = siteSettings?.Value<BlockListItem>("utilityNavigation");
+    var mainNavigation = siteSettings?.Value<BlockListItem>("mainNavigation");
 }
 
 <header class="border-b border-border-subtle bg-header">
@@ -14,12 +14,12 @@
 
     @await Html.PartialAsync("~/Views/Shared/Header/_Utility.cshtml", utilityNavigation)
 
-    <div class="mx-auto grid w-full max-w-[var(--layout-width-content)] gap-4 px-gutter py-4 lg:grid-cols-[auto_1fr] lg:items-center">
+    <div class="mx-auto grid w-full max-w-[var(--layout-width-content)] gap-4 px-gutter py-4 lg:grid-cols-[auto_auto] lg:justify-between lg:items-center">
         <div class="grid grid-cols-[1fr_auto] items-center gap-4 lg:grid-cols-1">
             
             @await Html.PartialAsync("~/Views/Shared/Header/_Logo.cshtml",  new HeaderLogoViewModel(siteName, siteLogo))
 
-            @if (mainNavigation.Any())
+            @if (mainNavigation is not null)
             {
                 <button
                     aria-controls="site-main-navigation"

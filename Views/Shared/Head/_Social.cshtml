@@ -1,0 +1,36 @@
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<(string Title, string? Description, string? ImageUrl, string? PageUrl, string SiteName)>
+@{
+    var title = Model.Title;
+    var description = Model.Description;
+    var imageUrl = Model.ImageUrl;
+    var pageUrl = Model.PageUrl;
+    var siteName = Model.SiteName;
+}
+<meta property="og:title" content="@title" />
+<meta property="og:type" content="website" />
+@if (!string.IsNullOrWhiteSpace(description))
+{
+    <meta property="og:description" content="@description" />
+}
+@if (!string.IsNullOrWhiteSpace(pageUrl))
+{
+    <meta property="og:url" content="@pageUrl" />
+}
+@if (!string.IsNullOrWhiteSpace(siteName))
+{
+    <meta property="og:site_name" content="@siteName" />
+}
+@if (!string.IsNullOrWhiteSpace(imageUrl))
+{
+    <meta property="og:image" content="@imageUrl" />
+}
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="@title" />
+@if (!string.IsNullOrWhiteSpace(description))
+{
+    <meta name="twitter:description" content="@description" />
+}
+@if (!string.IsNullOrWhiteSpace(imageUrl))
+{
+    <meta name="twitter:image" content="@imageUrl" />
+}

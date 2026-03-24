@@ -1,0 +1,51 @@
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
+@using Umbraco.Cms.Core.Models
+@using Umbraco.Cms.Core.Models.Blocks
+@{
+    var siteSettings = Umbraco.ContentAtRoot().FirstOrDefault(x => x.ContentType.Alias == "siteSettings");
+    var siteName = siteSettings?.Value<string>("siteName") ?? "";
+    var siteLogo = siteSettings?.Value<IPublishedContent>("siteLogo");
+    var footerNavigation = siteSettings?.Value<IEnumerable<BlockListItem>>("footerNavigation") ?? Enumerable.Empty<BlockListItem>();
+    var socialLinks = siteSettings?.Value<IEnumerable<BlockListItem>>("socialLinks") ?? Enumerable.Empty<BlockListItem>();
+    var footerText = siteSettings?.Value("footerText");
+    var isFooterText = footerText is not null && !string.IsNullOrWhiteSpace(footerText.ToString());
+    var copyright = siteSettings?.Value<string>("copyright");
+    var isCopyright = copyright is not null && !string.IsNullOrWhiteSpace(copyright.ToString());
+
+}
+
+<footer class="bg-footer text-text-inverse">
+    <div class="mx-auto grid min-h-20 w-full max-w-[var(--layout-width-content)] gap-8 px-gutter py-8">
+        <div class="grid gap-8 lg:grid-cols-[auto_1fr] lg:items-start">
+            @await Html.PartialAsync("~/Views/Shared/Footer/_Brand.cshtml", (siteName, siteLogo))
+
+            <div class="grid gap-6 lg:grid-flow-col lg:justify-start lg:gap-8">
+                @if (footerNavigation.Any())
+                {
+                    @await Html.PartialAsync(
+                        "~/Views/Shared/Footer/_LinkList.cshtml",
+                        (footerNavigation, "Footer navigation", "block py-2 text-text-inverse no-underline lg:py-0"))
+                }
+
+                @if (socialLinks.Any())
+                {
+                    @await Html.PartialAsync(
+                        "~/Views/Shared/Footer/_LinkList.cshtml",
+                        (socialLinks, "Social links", "block py-2 text-text-muted no-underline lg:py-0"))
+                }
+            </div>
+        </div>
+
+        @if (isFooterText)
+        {
+            <div class="text-sm text-text-muted">
+                @footerText
+            </div>
+        }
+
+        @if (isCopyright)
+        {
+            <p class="border-t border-border-subtle pt-4 text-sm text-text-muted">@Html.Raw(copyrightLine)</p>
+        }
+    </div>
+</footer>

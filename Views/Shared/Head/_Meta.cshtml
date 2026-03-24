@@ -1,0 +1,17 @@
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<(string DocumentTitle, string? MetaDescription, bool HideFromSearchEngines)>
+@{
+    var documentTitle = Model.DocumentTitle;
+    var metaDescription = Model.MetaDescription;
+    var hideFromSearchEngines = Model.HideFromSearchEngines;
+}
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>@documentTitle</title>
+@if (!string.IsNullOrWhiteSpace(metaDescription))
+{
+    <meta name="description" content="@metaDescription" />
+}
+@if (hideFromSearchEngines)
+{
+    <meta name="robots" content="noindex, nofollow" />
+}

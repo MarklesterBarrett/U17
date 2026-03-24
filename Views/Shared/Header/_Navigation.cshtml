@@ -1,14 +1,15 @@
-@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<IEnumerable<Umbraco.Cms.Core.Models.Blocks.BlockListItem>>
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockListItem?>
 @using Umbraco.Cms.Core.Models
 @using Umbraco.Cms.Core.Models.Blocks
 @{
-    var blocks = Model ?? Enumerable.Empty<BlockListItem>();
+    var links = Model?.Content.Value<IEnumerable<BlockListItem>>("links")?.ToList()
+        ?? new List<BlockListItem>();
 }
 
-@if (blocks.Any())
+@if (links.Any())
 {
     <nav id="site-main-navigation" aria-label="Main navigation" class="hidden grid-cols-1 border-t border-border-subtle pt-4 lg:grid lg:grid-flow-col lg:justify-end lg:gap-6 lg:border-t-0 lg:pt-0">
-        @foreach (var block in blocks)
+        @foreach (var block in links)
         {
             var content = block.Content;
             var link = content.Value<Link>("link")

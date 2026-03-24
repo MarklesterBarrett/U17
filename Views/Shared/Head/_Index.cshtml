@@ -1,0 +1,40 @@
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
+@using Umbraco.Cms.Core.Models
+@using Umbraco.Cms.Core.Models.Blocks
+@{
+    var siteSettings = Umbraco.ContentAtRoot().FirstOrDefault(x => x.ContentType.Alias == "siteSettings");
+    var pageTitle = ViewData["Title"] as string;
+    pageTitle = string.IsNullOrWhiteSpace(pageTitle) ? Model?.Name : pageTitle;
+
+    var siteName = siteSettings?.Value<string>("siteName") ?? string.Empty;
+    var siteTitlePattern = siteSettings?.Value<string>("siteTitle");
+
+    var metaBlock = Model?.Value<BlockListItem>("meta");
+    var metaContent = metaBlock?.Content;
+    var metaTitle = metaContent?.Value<string>("metaTitle");
+    var metaDescription = metaContent?.Value<string>("metaDescription");
+    var hideFromSearchEngines = metaContent?.Value<bool>("hideFromSearchEngines") ?? false;
+
+    var documentPageTitle = string.IsNullOrWhiteSpace(metaTitle) ? pageTitle : metaTitle;
+    var documentTitle = string.IsNullOrWhiteSpace(siteTitlePattern)
+        ? (!string.IsNullOrWhiteSpace(documentPageTitle) && !string.IsNullOrWhiteSpace(siteName) ? $"{documentPageTitle} | {siteName}" : documentPageTitle ?? siteName)
+        : siteTitlePattern
+            .Replace("{page}", documentPageTitle ?? string.Empty, StringComparison.OrdinalIgnoreCase)
+            .Replace("{site}", siteName, StringComparison.OrdinalIgnoreCase);
+
+    var socialBlock = Model?.Value<BlockListItem>("social");
+    var socialContent = socialBlock?.Content;
+    var socialTitle = socialContent?.Value<string>("socialTitle");
+    var socialDescription = socialContent?.Value<string>("socialDescription");
+    var socialImage = socialContent?.Value<MediaWithCrops>("socialImage");
+
+    var socialResolvedTitle = string.IsNullOrWhiteSpace(socialTitle) ? documentTitle : socialTitle;
+    var socialResolvedDescription = string.IsNullOrWhiteSpace(socialDescription) ? metaDescription : socialDescription;
+    var socialImageUrl = socialImage?.GetCropUrl("openGraph");
+    var pageUrl = Model?.Url(mode: UrlMode.Absolute);
+}
+
+@await Html.PartialAsync("~/Views/Shared/Head/_Meta.cshtml", (documentTitle, metaDescription, hideFromSearchEngines))
+@await Html.PartialAsync("~/Views/Shared/Head/_Social.cshtml", (socialResolvedTitle, socialResolvedDescription, socialImageUrl, pageUrl, siteName))
+@await Html.PartialAsync("~/Views/Shared/Head/_Favicon.cshtml")
+<link rel="stylesheet" href="~/css/site.css" />
