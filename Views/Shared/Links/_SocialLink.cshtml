@@ -1,0 +1,55 @@
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<(Umbraco.Cms.Core.Models.PublishedContent.IPublishedElement Content, string? LinkClass, string? IconClass)>
+@using Umbraco.Cms.Core.Models
+@using Umbraco.Cms.Core.Models.PublishedContent
+@using Umbraco.Extensions
+@{
+    var content = Model.Content;
+    var linkClass = Model.LinkClass ?? string.Empty;
+    var iconClass = string.IsNullOrWhiteSpace(Model.IconClass) ? "h-8 w-8" : Model.IconClass!;
+
+    var link = content.Value<Link>("link")
+        ?? content.Value<IEnumerable<Link>>("link")?.FirstOrDefault();
+
+    if (link is null)
+    {
+        return;
+    }
+
+    var platform = content.Value<string>("platform")?.Trim();
+    var customSocialIcon = content.Value<IPublishedContent>("customSocialIcon");
+    var label = content.Value<string>("label")?.Trim();
+    var visibleLabel = !string.IsNullOrWhiteSpace(label) ? label : link.Name?.Trim();
+    var screenReaderLabel = content.Value<string>("screenReaderLabel")?.Trim();
+    var accessibleLabel = !string.IsNullOrWhiteSpace(visibleLabel)
+        ? visibleLabel
+        : !string.IsNullOrWhiteSpace(screenReaderLabel)
+            ? screenReaderLabel
+            : !string.IsNullOrWhiteSpace(platform)
+                ? platform
+                : link.Url?.ToString() ?? "Social link";
+}
+
+<a class="@linkClass"
+   href="@link.Url"
+   target="@link.Target"
+   aria-label="@(string.IsNullOrWhiteSpace(visibleLabel) ? accessibleLabel : null)">
+    @if (customSocialIcon is not null)
+    {
+        <img class="@iconClass" src="@customSocialIcon.Url()" alt="" aria-hidden="true" />
+    }
+    else if (!string.IsNullOrWhiteSpace(platform))
+    {
+        <span class="@iconClass" aria-hidden="true">
+            @await Html.PartialAsync("~/Views/Shared/Links/_SocialIcon.cshtml", platform)
+        </span>
+    }
+
+    @if (!string.IsNullOrWhiteSpace(visibleLabel))
+    {
+        @visibleLabel
+    }
+    else
+    {
+        <span class="sr-only">@accessibleLabel</span>
+    }
+</a>

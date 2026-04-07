@@ -1,0 +1,21 @@
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<(IEnumerable<Umbraco.Cms.Core.Models.Blocks.BlockListItem> Blocks, string? LinkClass, string? IconClass)>
+@using Umbraco.Cms.Core.Models.Blocks
+@{
+    var blocks = Model.Blocks ?? Enumerable.Empty<BlockListItem>();
+}
+
+@foreach (var block in blocks)
+{
+    var alias = block.Content.ContentType.Alias;
+
+    if (alias == "navigationLink")
+    {
+        @await Html.PartialAsync("~/Views/Shared/Links/_GlobalLink.cshtml", (block.Content, Model.LinkClass, Model.IconClass))
+        continue;
+    }
+
+    if (alias == "socialLink")
+    {
+        @await Html.PartialAsync("~/Views/Shared/Links/_SocialLink.cshtml", (block.Content, Model.LinkClass, Model.IconClass))
+    }
+}

@@ -2,50 +2,37 @@
 @using Umbraco.Cms.Core.Models
 @using Umbraco.Cms.Core.Models.Blocks
 @{
-    var blocks = Model.Blocks ?? Enumerable.Empty<BlockListItem>();
-    var label = Model.Label;
-    var linkClass = Model.LinkClass;
-    var groupedBlocks = blocks.Where(x => x.Content.ContentType.Alias == "linkList").ToList();
-}
-
-@if (blocks.Any())
+var blocks = Model.Blocks ?? Enumerable.Empty<BlockListItem>();
+var label = Model.Label;
+var linkClass = Model.LinkClass;
+var groupedBlocks = blocks.Where(x => x.Content.ContentType.Alias == "linkListWithTitle").ToList();
+if (blocks.Any())
 {
-    <nav aria-label="@label" class="grid gap-6 lg:grid-flow-col lg:justify-end lg:gap-8">
-        @foreach (var group in groupedBlocks)
-        {
-            var title = group.Content.Value<string>("title");
-            var links = group.Content.Value<IEnumerable<BlockListItem>>("links") ?? Enumerable.Empty<BlockListItem>();
+return;
+}
+}
+<nav aria-label="@label" class="grid gap-6 lg:grid-flow-col lg:justify-end lg:gap-8">
+    @foreach (var group in groupedBlocks)
+    {
+        var title = group.Content.Value<string>("title");
+        var links = group.Content.Value<IEnumerable<BlockListItem>>("links") ?? Enumerable.Empty<BlockListItem>();
 
-            if (!links.Any())
+        if (!links.Any())
+        {
+            continue;
+        }
+
+        <div class="grid gap-3">
+            @if (!string.IsNullOrWhiteSpace(title))
             {
-                continue;
+                <p class="text-sm font-bold text-text-inverse">@title</p>
             }
 
             <div class="grid gap-3">
-                @if (!string.IsNullOrWhiteSpace(title))
-                {
-                    <p class="text-sm font-bold text-text-inverse">@title</p>
-                }
-
-                <div class="grid gap-3">
-                    @foreach (var block in links)
-                    {
-                        var content = block.Content;
-                        var link = content.Value<Link>("link")
-                            ?? content.Value<IEnumerable<Link>>("link")?.FirstOrDefault();
-
-                        if (link is null)
-                        {
-                            continue;
-                        }
-
-                        var linkUrl = link.Url?.ToString() ?? "#";
-                        var linkTarget = link.Target?.ToString();
-                        var linkName = string.IsNullOrWhiteSpace(link.Name) ? linkUrl : link.Name;
-                        <a class="@linkClass" href="@linkUrl" target="@linkTarget">@linkName</a>
-                    }
-                </div>
+                @await Html.PartialAsync("~/Views/Shared/Links/_LinkItems.cshtml", (links, $"{linkClass} inline-flex items-center gap-3", "h-8 w-8"))
             </div>
-        }
-    </nav>
-}
+        </div>
+    }
+
+</nav>
+

@@ -3,6 +3,7 @@
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <RootNamespace>Site</RootNamespace>
     <CompressionEnabled>false</CompressionEnabled> <!-- Disable compression. E.g. for umbraco backoffice files. These files should be precompressed by node and not let dotnet handle it -->
   </PropertyGroup>
 
@@ -10,6 +11,7 @@
     <PackageReference Include="MimeKit" Version="4.15.1" />
     <PackageReference Include="Umbraco.Cms" Version="17.2.2" />
     <PackageReference Include="Umbraco.Cms.DevelopmentMode.Backoffice" Version="17.2.2" />
+    <PackageReference Include="Umbraco.Community.Contentment" Version="6.1.1" />
     <PackageReference Include="uSync" Version="17.0.2" />
   </ItemGroup>
 

@@ -27,13 +27,44 @@ This repository is an Umbraco website built with plain cshtml views and Tailwind
 ## CSS and Tailwind rules
 
 - Tailwind is the default styling approach
-- Use a constrained design-token layer driven by CSS custom properties
-- Maximum CSS variable budget: 60 global variables
-- Do not create ad hoc variables unless approved
-- Prefer token reuse over new token creation
-- Use utility classes first, component extraction second
-- Avoid custom CSS unless Tailwind or tokens cannot express the requirement cleanly
-- support for 320px baseline phones, from 768px tablet, and 1024 laptop, 1440 desktop.
+- Use design tokens via CSS custom properties for color, spacing, type, radius, and motion
+
+### Tokens
+
+- Maximum: 60 global tokens (defined in `:root` or theme scope)
+- New tokens require review and justification
+- Prefer reuse of existing tokens over introducing new ones
+
+### Tailwind usage
+
+- Prefer utility classes for layout and styling
+- Extract reusable classes only when the pattern repeats 3+ times or the class string becomes hard to maintain
+- Do not mix multiple near-duplicate class patterns across templates
+
+### Reusable classes
+
+- Treat reusable classes as single sources of truth
+- Define once, reuse across components
+- Interactive states (`hover`, `focus`, `active`) must be included in the reusable class definition
+
+### Custom CSS
+
+- Avoid custom CSS unless Tailwind or tokens cannot express the requirement clearly
+- Any custom CSS must use existing tokens
+
+### Consistency
+
+- Avoid ad hoc variables or one-off styling patterns
+- Keep styling decisions centralised and predictable
+
+### Breakpoints
+
+- Mobile-first: 320px baseline
+- Tablet: 768px+
+- Laptop: 1024px+
+- Desktop: 1440px+
+- Responsive token values should use the keys `mobile`, `tablet`, `laptop`, and `desktop`
+- Breakpoints must align with the Tailwind configuration
 
 ## Design-token goal
 

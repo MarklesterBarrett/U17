@@ -1,0 +1,20 @@
+{
+  "$schema": "../../umbraco-package-schema.json",
+  "name": "My.DesignTokens",
+  "version": "1.0.0",
+  "extensions": [
+    {
+      "type": "propertyEditorUi",
+      "alias": "My.PropertyEditorUi.Contentment.ColorSwatches",
+      "name": "Contentment Color Swatches",
+      "element": "/App_Plugins/DesignTokens/color-swatches.element.js",
+      "elementName": "my-contentment-color-swatches",
+      "meta": {
+        "label": "Contentment Color Swatches",
+        "icon": "icon-colorpicker",
+        "group": "common",
+        "propertyEditorSchemaAlias": "Umbraco.Plain.String"
+      }
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockListItem?>
+@using Umbraco.Cms.Core.Models
+@using Umbraco.Cms.Core.Models.Blocks
+@{
+    var navigationLinksBlock = Model?.Content.Value<BlockListItem>("navigationBarLinks");
+    var links = navigationLinksBlock?.Content.Value<IEnumerable<BlockListItem>>("links")?.ToList()
+        ?? new List<BlockListItem>();
+
+    if (!links.Any())
+    {
+        return;
+    }
+}
+
+<nav id="site-main-navigation" aria-label="Main navigation" class="hidden grid-cols-1 border-t border-border-subtle pt-4 lg:grid lg:grid-flow-col lg:justify-end lg:gap-6 lg:border-t-0 lg:pt-0">
+    @await Html.PartialAsync("~/Views/Shared/Links/_LinkItems.cshtml", (links.AsEnumerable(), "flex w-full items-center gap-3 border-b border-border-subtle py-3 text-text-strong no-underline last:border-b-0 lg:w-auto lg:border-b-0 lg:py-0", "h-8 w-8"))
+</nav>

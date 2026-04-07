@@ -1,0 +1,55 @@
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<(Umbraco.Cms.Core.Models.PublishedContent.IPublishedElement Content, string? LinkClass, string? IconClass)>
+@using Umbraco.Cms.Core.Models
+@using Umbraco.Cms.Core.Models.PublishedContent
+@using Umbraco.Extensions
+@{
+    var content = Model.Content;
+    var linkClass = Model.LinkClass ?? string.Empty;
+    var iconClass = string.IsNullOrWhiteSpace(Model.IconClass) ? "h-8 w-8" : Model.IconClass!;
+
+    var link = content.Value<Link>("link")
+        ?? content.Value<IEnumerable<Link>>("link")?.FirstOrDefault();
+
+    if (link is null)
+    {
+        return;
+    }
+
+    var linkUrl = link.Url?.ToString() ?? "#";
+    var linkTarget = link.Target?.ToString();
+    var visibleLabel = link.Name?.Trim();
+    var screenReaderLabel = content.Value<string>("screenReaderLabel")?.Trim();
+    var accessibleLabel = !string.IsNullOrWhiteSpace(visibleLabel)
+        ? visibleLabel
+        : !string.IsNullOrWhiteSpace(screenReaderLabel)
+            ? screenReaderLabel
+            : linkUrl;
+
+    var leadingIcon = content.Value<IPublishedContent>("leadingIcon");
+    var trailingIcon = content.Value<IPublishedContent>("trailingIcon");
+    var hasVisibleLabel = !string.IsNullOrWhiteSpace(visibleLabel);
+}
+
+<a class="@linkClass"
+   href="@linkUrl"
+   target="@linkTarget"
+   aria-label="@(hasVisibleLabel ? null : accessibleLabel)">
+    @if (leadingIcon is not null)
+    {
+        <img class="@iconClass" src="@leadingIcon.Url()" alt="" aria-hidden="true" />
+    }
+
+    @if (hasVisibleLabel)
+    {
+        @visibleLabel
+    }
+    else
+    {
+        <span class="sr-only">@accessibleLabel</span>
+    }
+
+    @if (trailingIcon is not null)
+    {
+        <img class="@iconClass" src="@trailingIcon.Url()" alt="" aria-hidden="true" />
+    }
+</a>

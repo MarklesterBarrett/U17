@@ -31,7 +31,7 @@
                 {
                     @await Html.PartialAsync(
                         "~/Views/Shared/Footer/_LinkList.cshtml",
-                        (socialLinks, "Social links", "block py-2 text-text-muted no-underline lg:py-0"))
+                        (socialLinks, "Social links", "block py-2 text-text-inverse no-underline lg:py-0"))
                 }
             </div>
         </div>
@@ -45,7 +45,7 @@
 
         @if (isCopyright)
         {
-            <p class="border-t border-border-subtle pt-4 text-sm text-text-muted">@Html.Raw(copyrightLine)</p>
+            <p class="border-t border-border-subtle pt-4 text-sm text-text-muted">@Html.Raw(copyright)</p>
         }
     </div>
 </footer>

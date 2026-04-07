@@ -1,0 +1,42 @@
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<(string SiteName, Umbraco.Cms.Core.Models.Blocks.BlockListItem? HeaderBlock)>
+@using Umbraco.Cms.Core.Models.Blocks
+@{
+    var siteName = Model.SiteName;
+    var headerBlock = Model.HeaderBlock;
+    var headerItems = headerBlock?.Content.Value<IEnumerable<BlockListItem>>("headerItems")?.ToList()
+        ?? new List<BlockListItem>();
+
+    var logoHeader = headerItems.FirstOrDefault(x => x.Content.ContentType.Alias == "logoHeaderBlock");
+    var utilityBarBlock = headerItems.FirstOrDefault(x => x.Content.ContentType.Alias == "utilityBar");
+    var navigationBarBlock = headerItems.FirstOrDefault(x => x.Content.ContentType.Alias == "navigationBar");
+}
+
+<header class="border-b border-border-subtle bg-header">
+    <a class="sr-only focus:not-sr-only focus:absolute focus:left-gutter focus:top-4 focus:z-50 focus:rounded-control focus:bg-panel focus:px-4 focus:py-3" href="#main-content">Skip to content</a>
+
+    @await Html.PartialAsync("~/Views/Shared/Header/_UtilityBar.cshtml", utilityBarBlock)
+
+    <div class="mx-auto grid w-full max-w-[var(--layout-width-content)] gap-4 px-gutter py-4 lg:grid-cols-[auto_auto] lg:justify-between lg:items-center">
+        <div class="grid grid-cols-[1fr_auto] items-center gap-4 lg:grid-cols-1">
+            @await Html.PartialAsync("~/Views/Shared/Header/_LogoHeader.cshtml", (siteName, logoHeader))
+
+            @if (navigationBarBlock is not null)
+            {
+                <button
+                    aria-controls="site-main-navigation"
+                    aria-expanded="false"
+                    class="grid h-11 w-11 place-items-center justify-self-end rounded-control border border-border-subtle bg-panel text-text-strong lg:hidden"
+                    data-nav-toggle
+                    type="button">
+                    <span class="sr-only">Toggle navigation</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 30" width="30" height="30" focusable="false" aria-hidden="true">
+                        <title>Menu</title>
+                        <path stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-miterlimit="10" d="M4 7h22M4 15h22M4 23h22"></path>
+                    </svg>
+                </button>
+            }
+        </div>
+
+        @await Html.PartialAsync("~/Views/Shared/Header/_NavigationBar.cshtml", navigationBarBlock)
+    </div>
+</header>

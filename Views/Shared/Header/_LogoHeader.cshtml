@@ -1,7 +1,9 @@
-@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<dynamic>
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<(string SiteName, Umbraco.Cms.Core.Models.Blocks.BlockListItem? LogoHeaderBlock)>
+@using Umbraco.Cms.Core.Models
+@using Umbraco.Cms.Core.Models.Blocks
 @{
-    var siteName = (string)Model.SiteName;
-    var siteLogo = (IPublishedContent?)Model.SiteLogo;
+    var siteName = Model.SiteName;
+    var siteLogo = Model.LogoHeaderBlock?.Content.Value<IPublishedContent>("headerLogo");
     var logoFile = siteLogo?.Value<string>("umbracoFile");
     var logoAlt = !string.IsNullOrWhiteSpace(siteName) ? siteName : System.IO.Path.GetFileNameWithoutExtension(logoFile) ?? "Site";
     var logoUrl = siteLogo?.Url();
@@ -10,7 +12,7 @@
 }
 
 <a class="grid justify-self-start text-text-strong no-underline" href="/">
-    @if (siteLogo != null)
+    @if (siteLogo is not null)
     {
         <img
             alt="@logoAlt"

@@ -19,8 +19,8 @@
     var documentTitle = string.IsNullOrWhiteSpace(siteTitlePattern)
         ? (!string.IsNullOrWhiteSpace(documentPageTitle) && !string.IsNullOrWhiteSpace(siteName) ? $"{documentPageTitle} | {siteName}" : documentPageTitle ?? siteName)
         : siteTitlePattern
-            .Replace("{page}", documentPageTitle ?? string.Empty, StringComparison.OrdinalIgnoreCase)
-            .Replace("{site}", siteName, StringComparison.OrdinalIgnoreCase);
+            .Replace("{pageName}", documentPageTitle ?? string.Empty, StringComparison.OrdinalIgnoreCase)
+            .Replace("{siteName}", siteName, StringComparison.OrdinalIgnoreCase);
 
     var socialBlock = Model?.Value<BlockListItem>("social");
     var socialContent = socialBlock?.Content;
