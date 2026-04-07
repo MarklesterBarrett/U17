@@ -34,6 +34,15 @@ This repository is an Umbraco website built with plain cshtml views and Tailwind
 - Maximum: 60 global tokens (defined in `:root` or theme scope)
 - New tokens require review and justification
 - Prefer reuse of existing tokens over introducing new ones
+- Define and use tokens as named semantic variables, not raw values
+- Represent design intent, not appearance
+- Use role-based names such as `color.primary` or `surface.default`, not hex values or visual descriptions
+- Store visual values as tokens for color, spacing, typography, radius, shadow, and motion
+- Reference tokens in UI definitions and reusable classes
+- Do not hardcode visual values in components
+- Maintain a single source of truth so token updates propagate globally
+- Support theming through token value switching, for example light and dark modes
+- Keep token naming consistent, semantic, and purpose-led
 
 ### Tailwind usage
 
@@ -79,6 +88,8 @@ These variables should cover:
 - layout widths
 - motion
 - component surface styling
+
+Goal: enforce consistency, enable global changes, and keep design and code aligned.
 
 ## Accessibility
 

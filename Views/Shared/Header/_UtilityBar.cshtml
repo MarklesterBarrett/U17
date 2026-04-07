@@ -1,10 +1,24 @@
 @inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockListItem?>
+@inject Site.DesignTokens.IDesignTokenStyleRenderer TokenStyles
 @using Umbraco.Cms.Core.Models
 @using Umbraco.Cms.Core.Models.Blocks
 @{
     var utilityLinksBlock = Model?.Content.Value<BlockListItem>("utilityBarLinks");
     var links = utilityLinksBlock?.Content.Value<IEnumerable<BlockListItem>>("links")?.ToList()
         ?? new List<BlockListItem>();
+    var backgroundColor = Model?.Settings?.Value<string>("backgroundColor");
+    var borderColor = Model?.Settings?.Value<string>("borderColor");
+    var textColor = Model?.Settings?.Value<string>("textColor");
+
+    var wrapperStyle = TokenStyles.CombineDeclarations(
+        TokenStyles.ResolveColorDeclaration("background-color", backgroundColor),
+        TokenStyles.ResolveColorDeclaration("border-color", borderColor));
+
+    var navStyle = TokenStyles.CombineDeclarations(
+        TokenStyles.ResolveColorDeclaration("color", textColor));
+
+    var wrapperClass = $"border-b{(string.IsNullOrWhiteSpace(borderColor) ? " border-border-subtle" : string.Empty)}{(string.IsNullOrWhiteSpace(backgroundColor) ? " bg-panel-muted" : string.Empty)}";
+    var navClass = $"grid grid-flow-col gap-4 text-sm{(string.IsNullOrWhiteSpace(textColor) ? " text-text-muted" : string.Empty)}";
 
     if (!links.Any())
     {
@@ -12,9 +26,9 @@
     }
 }
 
-<div class="border-b border-border-subtle bg-panel-muted">
+<div class="@wrapperClass" style="@wrapperStyle">
     <div class="mx-auto grid min-h-10 w-full max-w-[var(--layout-width-content)] items-center justify-items-end px-gutter py-2">
-        <nav aria-label="Utility navigation" class="grid grid-flow-col gap-4 text-sm text-text-muted">
+        <nav aria-label="Utility navigation" class="@navClass" style="@navStyle">
             @await Html.PartialAsync("~/Views/Shared/Links/_LinkItems.cshtml", (links.AsEnumerable(), "inline-flex items-center gap-3", "h-8 w-8"))
         </nav>
     </div>

@@ -3,15 +3,18 @@
 @{
     var siteName = Model.SiteName;
     var headerBlock = Model.HeaderBlock;
-    var headerItems = headerBlock?.Content.Value<IEnumerable<BlockListItem>>("headerItems")?.ToList()
-        ?? new List<BlockListItem>();
+    var logoHeader = headerBlock?.Content.Value<BlockListItem>("logo");
+    var utilityBarBlock = headerBlock?.Content.Value<BlockListItem>("utilityBar");
+    var navigationBarBlock = headerBlock?.Content.Value<BlockListItem>("navigationBar");
 
-    var logoHeader = headerItems.FirstOrDefault(x => x.Content.ContentType.Alias == "logoHeaderBlock");
-    var utilityBarBlock = headerItems.FirstOrDefault(x => x.Content.ContentType.Alias == "utilityBar");
-    var navigationBarBlock = headerItems.FirstOrDefault(x => x.Content.ContentType.Alias == "navigationBar");
+    var stickyBreakpoints = headerBlock?.Settings?.Value<IEnumerable<string>>("stickyHeader")?.ToList()
+        ?? new List<string>();
+    var stickyBreakpointsValue = stickyBreakpoints.Any()
+        ? string.Join(" ", stickyBreakpoints)
+        : null;
 }
 
-<header class="border-b border-border-subtle bg-header">
+<header class="border-b border-border-subtle bg-header" data-sticky-header="@(stickyBreakpointsValue)">
     <a class="sr-only focus:not-sr-only focus:absolute focus:left-gutter focus:top-4 focus:z-50 focus:rounded-control focus:bg-panel focus:px-4 focus:py-3" href="#main-content">Skip to content</a>
 
     @await Html.PartialAsync("~/Views/Shared/Header/_UtilityBar.cshtml", utilityBarBlock)
