@@ -1,5 +1,25 @@
-<link rel="icon" type="image/png" sizes="32x32" href="/assets/favicons/favicon-32x32.png" />
-<link rel="icon" type="image/png" sizes="16x16" href="/assets/favicons/favicon-16x16.png" />
-<link rel="apple-touch-icon" sizes="180x180" href="/assets/favicons/apple-touch-icon.png" />
-<link rel="manifest" href="/assets/favicons/site.webmanifest" />
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
+@using Umbraco.Cms.Core.Models
+@{
+    var siteSettings = ViewData["SiteSettings"] as Umbraco.Cms.Core.Models.PublishedContent.IPublishedContent;
+    var favicon = siteSettings?.Value<IPublishedContent>("favicon");
+    var faviconUrl = favicon?.Url();
+    var fallback32 = "/assets/favicons/favicon-32x32.png";
+    var fallback16 = "/assets/favicons/favicon-16x16.png";
+    var fallbackAppleTouch = "/assets/favicons/apple-touch-icon.png";
+}
+
+@if (!string.IsNullOrWhiteSpace(faviconUrl))
+{
+    <link rel="icon" href="@faviconUrl" />
+    <link rel="apple-touch-icon" href="@faviconUrl" />
+}
+else
+{
+    <link rel="icon" type="image/png" sizes="32x32" href="@fallback32" />
+    <link rel="icon" type="image/png" sizes="16x16" href="@fallback16" />
+    <link rel="apple-touch-icon" sizes="180x180" href="@fallbackAppleTouch" />
+    <link rel="manifest" href="/assets/favicons/site.webmanifest" />
+}
+
 <meta name="theme-color" content="#faf9f7" />

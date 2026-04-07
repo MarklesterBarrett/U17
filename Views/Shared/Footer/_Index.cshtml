@@ -1,23 +1,35 @@
 @inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
-@using Umbraco.Cms.Core.Models
+@inject Site.DesignTokens.IDesignTokenStyleRenderer TokenStyles
 @using Umbraco.Cms.Core.Models.Blocks
+@using Umbraco.Cms.Core.Strings
 @{
-    var siteSettings = Umbraco.ContentAtRoot().FirstOrDefault(x => x.ContentType.Alias == "siteSettings");
+    var siteSettings = ViewData["SiteSettings"] as Umbraco.Cms.Core.Models.PublishedContent.IPublishedContent;
+
+    var footerBlock = siteSettings?.Value<BlockListItem>("footer");
+    if (footerBlock is null)
+    {
+        return;
+    }
+
     var siteName = siteSettings?.Value<string>("siteName") ?? "";
-    var siteLogo = siteSettings?.Value<IPublishedContent>("siteLogo");
-    var footerNavigation = siteSettings?.Value<IEnumerable<BlockListItem>>("footerNavigation") ?? Enumerable.Empty<BlockListItem>();
-    var socialLinks = siteSettings?.Value<IEnumerable<BlockListItem>>("socialLinks") ?? Enumerable.Empty<BlockListItem>();
-    var footerText = siteSettings?.Value("footerText");
-    var isFooterText = footerText is not null && !string.IsNullOrWhiteSpace(footerText.ToString());
-    var copyright = siteSettings?.Value<string>("copyright");
-    var isCopyright = copyright is not null && !string.IsNullOrWhiteSpace(copyright.ToString());
+    var footerLogoBlock = footerBlock?.Content.Value<BlockListItem>("footerLogo");
+    var footerNavigation = footerBlock?.Content.Value<IEnumerable<BlockListItem>>("footerNavigation") ?? Enumerable.Empty<BlockListItem>();
+    var socialLinks = footerBlock?.Content.Value<IEnumerable<BlockListItem>>("socialLinks") ?? Enumerable.Empty<BlockListItem>();
+    var footerTextBlock = footerBlock?.Content.Value<BlockListItem>("footerText");
+    var footerText = footerTextBlock?.Content.Value<IHtmlEncodedString>("rte");
+    var isFooterText = footerText is not null && !string.IsNullOrWhiteSpace(footerText.ToHtmlString());
+    var copyrightBlock = footerBlock?.Content.Value<BlockListItem>("copyright");
+    var copyright = copyrightBlock?.Content.Value<IHtmlEncodedString>("rte");
+    var isCopyright = copyright is not null && !string.IsNullOrWhiteSpace(copyright.ToHtmlString());
+    var footerTextOverrides = TokenStyles.GetElementStyleOverrides(footerTextBlock?.Settings);
+    var copyrightOverrides = TokenStyles.GetElementStyleOverrides(copyrightBlock?.Settings);
 
 }
 
 <footer class="bg-footer text-text-inverse">
     <div class="mx-auto grid min-h-20 w-full max-w-[var(--layout-width-content)] gap-8 px-gutter py-8">
         <div class="grid gap-8 lg:grid-cols-[auto_1fr] lg:items-start">
-            @await Html.PartialAsync("~/Views/Shared/Footer/_Brand.cshtml", (siteName, siteLogo))
+            @await Html.PartialAsync("~/Views/Shared/Footer/_Brand.cshtml", (siteName, footerLogoBlock))
 
             <div class="grid gap-6 lg:grid-flow-col lg:justify-start lg:gap-8">
                 @if (footerNavigation.Any())
@@ -38,14 +50,16 @@
 
         @if (isFooterText)
         {
-            <div class="text-sm text-text-muted">
+            <div class="border border-transparent text-sm text-text-muted" style="@footerTextOverrides.InlineStyle">
                 @footerText
             </div>
         }
 
         @if (isCopyright)
         {
-            <p class="border-t border-border-subtle pt-4 text-sm text-text-muted">@Html.Raw(copyright)</p>
+            <div class="border-t border-border-subtle pt-4 text-sm text-text-muted" style="@copyrightOverrides.InlineStyle">
+                @copyright
+            </div>
         }
     </div>
 </footer>

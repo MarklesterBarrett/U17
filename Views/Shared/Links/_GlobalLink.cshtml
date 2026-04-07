@@ -1,4 +1,4 @@
-@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<(Umbraco.Cms.Core.Models.PublishedContent.IPublishedElement Content, string? LinkClass, string? IconClass)>
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<(Umbraco.Cms.Core.Models.PublishedContent.IPublishedElement Content, string? LinkClass, string? IconClass, string? LinkStyle)>
 @using Umbraco.Cms.Core.Models
 @using Umbraco.Cms.Core.Models.PublishedContent
 @using Umbraco.Extensions
@@ -6,6 +6,7 @@
     var content = Model.Content;
     var linkClass = Model.LinkClass ?? string.Empty;
     var iconClass = string.IsNullOrWhiteSpace(Model.IconClass) ? "h-8 w-8" : Model.IconClass!;
+    var linkStyle = Model.LinkStyle;
 
     var link = content.Value<Link>("link")
         ?? content.Value<IEnumerable<Link>>("link")?.FirstOrDefault();
@@ -33,6 +34,7 @@
 <a class="@linkClass"
    href="@linkUrl"
    target="@linkTarget"
+   style="@linkStyle"
    aria-label="@(hasVisibleLabel ? null : accessibleLabel)">
     @if (leadingIcon is not null)
     {

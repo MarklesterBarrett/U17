@@ -2,14 +2,15 @@
 @using Umbraco.Cms.Core.Models
 @using Umbraco.Cms.Core.Models.Blocks
 @{
-var blocks = Model.Blocks ?? Enumerable.Empty<BlockListItem>();
-var label = Model.Label;
-var linkClass = Model.LinkClass;
-var groupedBlocks = blocks.Where(x => x.Content.ContentType.Alias == "linkListWithTitle").ToList();
-if (blocks.Any())
-{
-return;
-}
+    var blocks = Model.Blocks ?? Enumerable.Empty<BlockListItem>();
+    var label = Model.Label;
+    var linkClass = Model.LinkClass;
+    var groupedBlocks = blocks.Where(x => x.Content.ContentType.Alias == "linkListWithTitle").ToList();
+
+    if (!groupedBlocks.Any())
+    {
+        return;
+    }
 }
 <nav aria-label="@label" class="grid gap-6 lg:grid-flow-col lg:justify-end lg:gap-8">
     @foreach (var group in groupedBlocks)
@@ -29,10 +30,9 @@ return;
             }
 
             <div class="grid gap-3">
-                @await Html.PartialAsync("~/Views/Shared/Links/_LinkItems.cshtml", (links, $"{linkClass} inline-flex items-center gap-3", "h-8 w-8"))
+                @await Html.PartialAsync("~/Views/Shared/Links/_LinkItems.cshtml", (links, $"{linkClass} inline-flex items-center gap-3", "h-8 w-8", null))
             </div>
         </div>
     }
 
 </nav>
-
