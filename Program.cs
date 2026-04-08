@@ -20,6 +20,7 @@ app.MapGet("/css/generated-tokens.css", (Guid? tenant, Site.DesignTokens.IDesign
     return Results.Content(cache.GetCss(tenant.Value), "text/css");
 });
 
+
 app.UseUmbraco()
     .WithMiddleware(u =>
     {
