@@ -2,5 +2,5 @@ namespace Site.DesignTokens;
 
 public interface IDesignTokenCssGenerator
 {
-    string GenerateCss();
+    string GenerateCss(Guid tenantKey);
 }

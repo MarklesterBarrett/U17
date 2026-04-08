@@ -11,9 +11,9 @@ public sealed class DesignTokenCssGenerator : IDesignTokenCssGenerator
         _designTokenProvider = designTokenProvider;
     }
 
-    public string GenerateCss()
+    public string GenerateCss(Guid tenantKey)
     {
-        var tokens = _designTokenProvider.GetTokens();
+        var tokens = _designTokenProvider.GetTokens(tenantKey);
         var builder = new StringBuilder();
 
         builder.AppendLine("/* Generated from site settings. Do not edit manually. */");

@@ -1,25 +1,25 @@
-using Umbraco.Cms.Core.PropertyEditors;
-using Umbraco.Community.Contentment.DataEditors;
 using Site.DesignTokens;
 using System.Text.Json;
+using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Community.Contentment.DataEditors;
 
 namespace Site.Contentment;
 
-public sealed class DesignTokenColorDataSource : IContentmentDataSource
+public sealed class DesignTokenValueDataSource : IContentmentDataSource
 {
     private const string PrefixesConfigKey = "prefixes";
     private readonly IDesignTokenProvider _designTokenProvider;
 
-    public DesignTokenColorDataSource(IDesignTokenProvider designTokenProvider)
+    public DesignTokenValueDataSource(IDesignTokenProvider designTokenProvider)
     {
         _designTokenProvider = designTokenProvider;
     }
 
-    public string Name => "Design Token Colors";
+    public string Name => "Design Token Values";
 
-    public string Description => "Reads color tokens from site settings.";
+    public string Description => "Reads value tokens from site settings.";
 
-    public string Icon => "icon-colorpicker";
+    public string Icon => "icon-autofill";
 
     public string Group => "Custom";
 
@@ -35,7 +35,7 @@ public sealed class DesignTokenColorDataSource : IContentmentDataSource
 
         return _designTokenProvider
             .GetTokens()
-            .Colors
+            .Values
             .Where(x => prefixes.Count == 0 || prefixes.Any(prefix => x.Alias.StartsWith(prefix, StringComparison.OrdinalIgnoreCase)))
             .Select(x => new DataListItem
             {

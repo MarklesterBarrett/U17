@@ -10,8 +10,15 @@ WebApplication app = builder.Build();
 
 await app.BootUmbracoAsync();
 
-app.MapGet("/css/generated-tokens.css", (Site.DesignTokens.IDesignTokenCssCache cache) =>
-    Results.Content(cache.GetCss(), "text/css"));
+app.MapGet("/css/generated-tokens.css", (Guid? tenant, Site.DesignTokens.IDesignTokenCssCache cache) =>
+{
+    if (tenant is null || tenant == Guid.Empty)
+    {
+        return Results.NotFound();
+    }
+
+    return Results.Content(cache.GetCss(tenant.Value), "text/css");
+});
 
 app.UseUmbraco()
     .WithMiddleware(u =>

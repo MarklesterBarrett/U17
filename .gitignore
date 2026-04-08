@@ -481,3 +481,6 @@ umbraco-package-schema.json
 
 # Media files
 /wwwroot/media/
+
+# Temporary alternate build output used for local verification
+/bin-temp/

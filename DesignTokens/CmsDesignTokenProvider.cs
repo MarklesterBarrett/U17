@@ -1,13 +1,12 @@
 using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Models.PublishedContent;
-using Umbraco.Cms.Core;
 using Umbraco.Extensions;
 
 namespace Site.DesignTokens;
 
 public sealed class CmsDesignTokenProvider : IDesignTokenProvider
 {
-    private const string SiteSettingsAlias = "siteSettings";
+    private const string DesignTokensAlias = "designTokens";
     private static readonly IReadOnlyList<(string PropertyAlias, string TokenAlias, string Label)> FixedColorProperties =
     [
         ("brand", "brand", "Brand"),
@@ -39,7 +38,6 @@ public sealed class CmsDesignTokenProvider : IDesignTokenProvider
     ];
     private static readonly IReadOnlyList<(string PropertyAlias, string TokenAlias, string Label)> FixedValueProperties =
     [
-        ("radiusNone", "radius-none", "None"),
         ("radiusSm", "radius-sm", "Small"),
         ("radiusMd", "radius-md", "Medium"),
         ("radiusLg", "radius-lg", "Large"),
@@ -62,53 +60,73 @@ public sealed class CmsDesignTokenProvider : IDesignTokenProvider
         ("shadowLifted", "shadow-lifted", "Lifted Shadow"),
         ("shadowFocus", "shadow-focus", "Focus Shadow")
     ];
-    private readonly IServiceScopeFactory _serviceScopeFactory;
+    private readonly ISiteSettingsResolver _siteSettingsResolver;
 
-    public CmsDesignTokenProvider(IServiceScopeFactory serviceScopeFactory)
+    public CmsDesignTokenProvider(ISiteSettingsResolver siteSettingsResolver)
     {
-        _serviceScopeFactory = serviceScopeFactory;
+        _siteSettingsResolver = siteSettingsResolver;
     }
 
     public DesignTokenSet GetTokens()
     {
-        using var scope = _serviceScopeFactory.CreateScope();
-        var publishedContentQuery = scope.ServiceProvider.GetRequiredService<IPublishedContentQuery>();
-        var siteSettings = publishedContentQuery
-            .ContentAtRoot()
-            .FirstOrDefault(x => string.Equals(x.ContentType.Alias, SiteSettingsAlias, StringComparison.Ordinal));
+        var siteSettings = _siteSettingsResolver.GetSiteSettings();
+        var designTokens = GetDesignTokens(siteSettings);
 
-        if (siteSettings is null)
+        if (designTokens is null)
         {
             return new DesignTokenSet([], [], []);
         }
 
         return new DesignTokenSet(
-            GetColorTokens(siteSettings),
-            GetSpacingTokens(siteSettings),
-            GetValueTokens(siteSettings));
+            GetColorTokens(designTokens),
+            GetSpacingTokens(designTokens),
+            GetValueTokens(designTokens));
     }
 
-    private static IReadOnlyList<ColorTokenDefinition> GetColorTokens(IPublishedContent siteSettings)
+    public DesignTokenSet GetTokens(Guid tenantKey)
+    {
+        var siteSettings = _siteSettingsResolver.GetSiteSettings(tenantKey);
+        var designTokens = GetDesignTokens(siteSettings);
+
+        if (designTokens is null)
+        {
+            return new DesignTokenSet([], [], []);
+        }
+
+        return new DesignTokenSet(
+            GetColorTokens(designTokens),
+            GetSpacingTokens(designTokens),
+            GetValueTokens(designTokens));
+    }
+
+    private static IPublishedElement? GetDesignTokens(IPublishedContent? siteSettings)
+    {
+        return siteSettings
+            ?.Value<BlockListItem>(DesignTokensAlias)
+            ?.Content;
+    }
+
+    private static IReadOnlyList<ColorTokenDefinition> GetColorTokens(IPublishedElement designTokens)
     {
         return FixedColorProperties
             .Select(definition => new ColorTokenDefinition(
                 definition.TokenAlias,
                 definition.Label,
-                siteSettings.Value<string>(definition.PropertyAlias)?.Trim() ?? string.Empty))
+                designTokens.Value<string>(definition.PropertyAlias)?.Trim() ?? string.Empty))
             .Where(token => !string.IsNullOrWhiteSpace(token.Value))
             .ToList();
     }
 
-    private static IReadOnlyList<SpacingTokenDefinition> GetSpacingTokens(IPublishedContent siteSettings)
+    private static IReadOnlyList<SpacingTokenDefinition> GetSpacingTokens(IPublishedElement designTokens)
     {
         return FixedSpacingProperties
             .Select(definition => new SpacingTokenDefinition(
                 definition.TokenAlias,
                 definition.Label,
-                siteSettings.Value<string>(definition.MobilePropertyAlias)?.Trim() ?? string.Empty,
-                siteSettings.Value<string>(definition.TabletPropertyAlias)?.Trim() ?? string.Empty,
-                siteSettings.Value<string>(definition.LaptopPropertyAlias)?.Trim() ?? string.Empty,
-                siteSettings.Value<string>(definition.DesktopPropertyAlias)?.Trim() ?? string.Empty))
+                designTokens.Value<string>(definition.MobilePropertyAlias)?.Trim() ?? string.Empty,
+                designTokens.Value<string>(definition.TabletPropertyAlias)?.Trim() ?? string.Empty,
+                designTokens.Value<string>(definition.LaptopPropertyAlias)?.Trim() ?? string.Empty,
+                designTokens.Value<string>(definition.DesktopPropertyAlias)?.Trim() ?? string.Empty))
             .Where(x => !string.IsNullOrWhiteSpace(x.Mobile) &&
                         !string.IsNullOrWhiteSpace(x.Tablet) &&
                         !string.IsNullOrWhiteSpace(x.Laptop) &&
@@ -116,16 +134,21 @@ public sealed class CmsDesignTokenProvider : IDesignTokenProvider
             .ToList();
     }
 
-    private static IReadOnlyList<ValueTokenDefinition> GetValueTokens(IPublishedContent siteSettings)
+    private static IReadOnlyList<ValueTokenDefinition> GetValueTokens(IPublishedElement designTokens)
     {
+        var builtInTokens = new[]
+        {
+            new ValueTokenDefinition("radius-none", "None", "0")
+        };
+
         var fixedTokens = FixedValueProperties
             .Select(definition => new ValueTokenDefinition(
                 definition.TokenAlias,
                 definition.Label,
-                siteSettings.Value<string>(definition.PropertyAlias)?.Trim() ?? string.Empty))
+                designTokens.Value<string>(definition.PropertyAlias)?.Trim() ?? string.Empty))
             .Where(token => !string.IsNullOrWhiteSpace(token.Value));
 
-        var additionalTokens = (siteSettings.Value<IEnumerable<BlockListItem>>("additionalTokens") ?? Enumerable.Empty<BlockListItem>())
+        var additionalTokens = (designTokens.Value<IEnumerable<BlockListItem>>("additionalTokens") ?? Enumerable.Empty<BlockListItem>())
             .Select(block => block.Content)
             .Where(content => content is not null)
             .Select(content => new ValueTokenDefinition(
@@ -136,7 +159,8 @@ public sealed class CmsDesignTokenProvider : IDesignTokenProvider
                             !string.IsNullOrWhiteSpace(token.Label) &&
                             !string.IsNullOrWhiteSpace(token.Value));
 
-        return fixedTokens
+        return builtInTokens
+            .Concat(fixedTokens)
             .Concat(additionalTokens)
             .ToList();
     }

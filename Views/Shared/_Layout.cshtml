@@ -1,8 +1,10 @@
 @inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
 @using Umbraco.Cms.Core.Models.PublishedContent
+@inject Site.DesignTokens.ISiteSettingsResolver SiteSettingsResolver
 @{
-    var siteSettings = Umbraco.ContentAtRoot().FirstOrDefault(x => x.ContentType.Alias == "siteSettings");
+    var siteSettings = SiteSettingsResolver.GetSiteSettings(Model);
     ViewData["SiteSettings"] = siteSettings;
+    ViewData["TenantKey"] = Model?.Root()?.Key;
 }
 <!DOCTYPE html>
 <html lang="en">

@@ -2,6 +2,6 @@ namespace Site.DesignTokens;
 
 public interface IDesignTokenCssCache
 {
-    string GetCss();
+    string GetCss(Guid tenantKey);
     void Invalidate();
 }

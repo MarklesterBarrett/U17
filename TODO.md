@@ -25,3 +25,4 @@
   - `radius-lg` -> `1.25rem`
   - `radius-full` -> `999px`
 - Replace this with token-backed radius data so radius values are not hardcoded in C#.
+- Review whether `Additional Tokens` should carry optional background surfaces such as `surface-secondary`, and if so expose that as an additional background-color choice.

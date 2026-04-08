@@ -3,6 +3,7 @@
 @using Umbraco.Cms.Core.Models.Blocks
 @{
     var siteSettings = ViewData["SiteSettings"] as Umbraco.Cms.Core.Models.PublishedContent.IPublishedContent;
+    var tenantKey = ViewData["TenantKey"] is Guid value ? value : null;
     var pageTitle = ViewData["Title"] as string;
     pageTitle = string.IsNullOrWhiteSpace(pageTitle) ? Model?.Name : pageTitle;
 
@@ -37,5 +38,8 @@
 @await Html.PartialAsync("~/Views/Shared/Head/_Meta.cshtml", (documentTitle, metaDescription, hideFromSearchEngines))
 @await Html.PartialAsync("~/Views/Shared/Head/_Social.cshtml", (socialResolvedTitle, socialResolvedDescription, socialImageUrl, pageUrl, siteName))
 @await Html.PartialAsync("~/Views/Shared/Head/_Favicon.cshtml")
-<link rel="stylesheet" href="~/css/generated-tokens.css" />
+@if (tenantKey.HasValue)
+{
+    <link rel="stylesheet" href="~/css/generated-tokens.css?tenant=@tenantKey.Value" />
+}
 <link rel="stylesheet" href="~/css/site.css" />
