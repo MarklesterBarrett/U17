@@ -1,5 +1,3 @@
-using System.Text.Json;
-using Microsoft.AspNetCore.Hosting;
 using Umbraco.Cms.Core.Models.PublishedContent;
 
 namespace Site.DesignTokens;
@@ -23,15 +21,11 @@ public sealed class DesignTokenStyleRenderer : IDesignTokenStyleRenderer
             ["alignContent"] = new("align-content", TokenValueKind.Raw)
         };
 
-    private readonly Lazy<IReadOnlyDictionary<string, string>> _colorTokens;
-    private readonly Lazy<IReadOnlyDictionary<string, string>> _spacingTokens;
+    private readonly IDesignTokenProvider _designTokenProvider;
 
-    public DesignTokenStyleRenderer(IWebHostEnvironment environment)
+    public DesignTokenStyleRenderer(IDesignTokenProvider designTokenProvider)
     {
-        var colorsPath = Path.Combine(environment.WebRootPath, "App_Plugins", "DesignTokens", "tokens", "colors.json");
-        var spacingPath = Path.Combine(environment.WebRootPath, "App_Plugins", "DesignTokens", "tokens", "spacing.json");
-        _colorTokens = new Lazy<IReadOnlyDictionary<string, string>>(() => LoadColorTokens(colorsPath));
-        _spacingTokens = new Lazy<IReadOnlyDictionary<string, string>>(() => LoadSpacingTokens(spacingPath));
+        _designTokenProvider = designTokenProvider;
     }
 
     public ElementStyleOverrides GetElementStyleOverrides(IPublishedElement? settings)
@@ -41,12 +35,15 @@ public sealed class DesignTokenStyleRenderer : IDesignTokenStyleRenderer
             return new ElementStyleOverrides(null);
         }
 
+        var tokenSet = _designTokenProvider.GetTokens();
+        var colorTokens = tokenSet.Colors.ToDictionary(x => x.Alias, x => x.Value, StringComparer.OrdinalIgnoreCase);
+        var spacingTokens = tokenSet.Spacing.Select(x => x.Alias).ToHashSet(StringComparer.OrdinalIgnoreCase);
         var declarations = new List<string>();
 
         foreach (var property in PropertyMap)
         {
             var settingValue = settings.Value<string>(property.Key);
-            var declaration = ResolveDeclaration(property.Value, settingValue);
+            var declaration = ResolveDeclaration(property.Value, settingValue, colorTokens, spacingTokens);
 
             if (!string.IsNullOrWhiteSpace(declaration))
             {
@@ -57,7 +54,11 @@ public sealed class DesignTokenStyleRenderer : IDesignTokenStyleRenderer
         return new ElementStyleOverrides(CombineDeclarations(declarations.ToArray()));
     }
 
-    private string? ResolveDeclaration(StylePropertyDefinition propertyDefinition, string? settingValue)
+    private string? ResolveDeclaration(
+        StylePropertyDefinition propertyDefinition,
+        string? settingValue,
+        IReadOnlyDictionary<string, string> colorTokens,
+        IReadOnlySet<string> spacingTokens)
     {
         if (string.IsNullOrWhiteSpace(settingValue))
         {
@@ -66,8 +67,8 @@ public sealed class DesignTokenStyleRenderer : IDesignTokenStyleRenderer
 
         var resolvedValue = propertyDefinition.ValueKind switch
         {
-            TokenValueKind.Color => ResolveTokenValue(_colorTokens.Value, settingValue),
-            TokenValueKind.Spacing => ResolveTokenValue(_spacingTokens.Value, settingValue),
+            TokenValueKind.Color => ResolveTokenValue(colorTokens, settingValue),
+            TokenValueKind.Spacing => ResolveSpacingTokenValue(spacingTokens, settingValue),
             TokenValueKind.Radius => ResolveRadiusValue(settingValue),
             TokenValueKind.Raw => settingValue,
             _ => null
@@ -85,6 +86,19 @@ public sealed class DesignTokenStyleRenderer : IDesignTokenStyleRenderer
     {
         return tokens.TryGetValue(tokenAlias, out var value) && !string.IsNullOrWhiteSpace(value)
             ? value
+            : null;
+    }
+
+    private static string? ResolveSpacingTokenValue(IReadOnlySet<string> tokens, string tokenAlias)
+    {
+        if (string.Equals(tokenAlias, "none", StringComparison.OrdinalIgnoreCase) ||
+            string.Equals(tokenAlias, "space-none", StringComparison.OrdinalIgnoreCase))
+        {
+            return "0";
+        }
+
+        return tokens.Contains(tokenAlias)
+            ? $"var(--{tokenAlias})"
             : null;
     }
 
@@ -109,117 +123,6 @@ public sealed class DesignTokenStyleRenderer : IDesignTokenStyleRenderer
             .ToList();
 
         return values.Count == 0 ? null : string.Join(" ", values);
-    }
-
-    private static IReadOnlyDictionary<string, string> LoadColorTokens(string colorsPath)
-    {
-        if (!File.Exists(colorsPath))
-        {
-            return new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-        }
-
-        using var stream = File.OpenRead(colorsPath);
-        using var document = JsonDocument.Parse(stream);
-
-        var tokens = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-
-        if (document.RootElement.ValueKind != JsonValueKind.Object)
-        {
-            return tokens;
-        }
-
-        foreach (var property in document.RootElement.EnumerateObject())
-        {
-            var token = property.Value;
-
-            if (!token.TryGetProperty("$type", out var typeElement) ||
-                !string.Equals(typeElement.GetString(), "color", StringComparison.OrdinalIgnoreCase))
-            {
-                continue;
-            }
-
-            if (!token.TryGetProperty("$value", out var valueElement))
-            {
-                continue;
-            }
-
-            var alias = TryGetAlias(token) ?? property.Name;
-            var value = valueElement.GetString();
-
-            if (string.IsNullOrWhiteSpace(alias) || string.IsNullOrWhiteSpace(value))
-            {
-                continue;
-            }
-
-            tokens[alias] = value;
-        }
-
-        return tokens;
-    }
-
-    private static IReadOnlyDictionary<string, string> LoadSpacingTokens(string spacingPath)
-    {
-        if (!File.Exists(spacingPath))
-        {
-            return new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-        }
-
-        using var stream = File.OpenRead(spacingPath);
-        using var document = JsonDocument.Parse(stream);
-
-        var tokens = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-        CollectSpacingTokens(document.RootElement, tokens);
-        return tokens;
-    }
-
-    private static string? TryGetAlias(JsonElement token)
-    {
-        if (!token.TryGetProperty("$extensions", out var extensionsElement) ||
-            !extensionsElement.TryGetProperty("site", out var siteElement) ||
-            !siteElement.TryGetProperty("alias", out var aliasElement))
-        {
-            return null;
-        }
-
-        return aliasElement.GetString();
-    }
-
-    private static void CollectSpacingTokens(JsonElement element, IDictionary<string, string> tokens)
-    {
-        if (element.ValueKind != JsonValueKind.Object)
-        {
-            return;
-        }
-
-        if (element.TryGetProperty("$type", out var typeElement) &&
-            string.Equals(typeElement.GetString(), "dimension", StringComparison.OrdinalIgnoreCase) &&
-            element.TryGetProperty("$value", out var valueElement) &&
-            valueElement.ValueKind == JsonValueKind.Object)
-        {
-            var alias = TryGetAlias(element);
-            var resolvedValue =
-                TryGetBreakpointValue(valueElement, "desktop") ??
-                TryGetBreakpointValue(valueElement, "laptop") ??
-                TryGetBreakpointValue(valueElement, "tablet") ??
-                TryGetBreakpointValue(valueElement, "mobile");
-
-            if (!string.IsNullOrWhiteSpace(alias) && !string.IsNullOrWhiteSpace(resolvedValue))
-            {
-                tokens[alias] = resolvedValue;
-            }
-        }
-
-        foreach (var property in element.EnumerateObject())
-        {
-            CollectSpacingTokens(property.Value, tokens);
-        }
-    }
-
-    private static string? TryGetBreakpointValue(JsonElement valueElement, string breakpoint)
-    {
-        return valueElement.TryGetProperty(breakpoint, out var breakpointElement)
-            ? breakpointElement.GetString()
-            : null;
     }
 
     private sealed record StylePropertyDefinition(string CssProperty, TokenValueKind ValueKind);

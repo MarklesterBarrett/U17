@@ -31,6 +31,8 @@ This repository is an Umbraco website built with plain cshtml views and Tailwind
 
 ### Tokens
 
+- Use a multi-layer token architecture: primitive -> alias -> semantic -> component
+- The separation between layers is intentional and must be preserved
 - Maximum: 60 global tokens (defined in `:root` or theme scope)
 - New tokens require review and justification
 - Prefer reuse of existing tokens over introducing new ones
@@ -43,6 +45,18 @@ This repository is an Umbraco website built with plain cshtml views and Tailwind
 - Maintain a single source of truth so token updates propagate globally
 - Support theming through token value switching, for example light and dark modes
 - Keep token naming consistent, semantic, and purpose-led
+
+### Token layering model
+
+- Primitives hold the raw visual values such as hex, px, rem, shadow values, and durations
+- Primitive tokens are never used directly in components or templates
+- Alias tokens map primitives into a brand or system decision layer and isolate future visual changes
+- Semantic tokens encode UI intent such as surface, text, border, action, focus, or spacing roles
+- Components may only consume semantic tokens or approved component tokens
+- Component tokens compose semantic tokens for a specific reusable UI pattern; they do not define raw values
+- Do not skip layers by binding components directly to primitives or brand aliases unless explicitly documented as an exception
+- When introducing a token, decide which layer it belongs to before adding it
+- If a token name describes appearance instead of intent, it is likely in the wrong layer
 
 ### Tailwind usage
 
