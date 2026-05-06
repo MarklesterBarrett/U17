@@ -19,6 +19,8 @@ public sealed class ContentmentComposer : IComposer
         builder.Services.AddUnique<IContentmentDataSource, DesignTokenColorDataSource>();
         builder.Services.AddUnique<IContentmentDataSource, DesignTokenSpacingDataSource>();
         builder.Services.AddUnique<IContentmentDataSource, DesignTokenValueDataSource>();
+        builder.Services.AddUnique<IContentmentDataSource, BuiltInBaseColorDataSource>();
+        builder.Services.AddUnique<IContentmentDataSource, BaseColorDataSource>();
         builder.Services.AddUnique<IContentmentListEditor, ColorSwatchListEditor>();
         builder.AddNotificationHandler<Umbraco.Cms.Core.Notifications.ContentPublishedNotification, DesignTokenCacheInvalidationHandler>();
         builder.AddNotificationHandler<Umbraco.Cms.Core.Notifications.ContentUnpublishedNotification, DesignTokenCacheInvalidationHandler>();

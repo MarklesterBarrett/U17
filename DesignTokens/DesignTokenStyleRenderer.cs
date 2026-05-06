@@ -38,12 +38,16 @@ public sealed class DesignTokenStyleRenderer : IDesignTokenStyleRenderer
         var tokenSet = _designTokenProvider.GetTokens();
         var colorTokens = tokenSet.Colors.ToDictionary(x => x.Alias, x => x.Value, StringComparer.OrdinalIgnoreCase);
         var spacingTokens = tokenSet.Spacing.Select(x => x.Alias).ToHashSet(StringComparer.OrdinalIgnoreCase);
+        var radiusTokens = tokenSet.Values
+            .Select(x => x.Alias)
+            .Where(x => x.StartsWith("radius-", StringComparison.OrdinalIgnoreCase))
+            .ToHashSet(StringComparer.OrdinalIgnoreCase);
         var declarations = new List<string>();
 
         foreach (var property in PropertyMap)
         {
             var settingValue = settings.Value<string>(property.Key);
-            var declaration = ResolveDeclaration(property.Value, settingValue, colorTokens, spacingTokens);
+            var declaration = ResolveDeclaration(property.Value, settingValue, colorTokens, spacingTokens, radiusTokens);
 
             if (!string.IsNullOrWhiteSpace(declaration))
             {
@@ -58,7 +62,8 @@ public sealed class DesignTokenStyleRenderer : IDesignTokenStyleRenderer
         StylePropertyDefinition propertyDefinition,
         string? settingValue,
         IReadOnlyDictionary<string, string> colorTokens,
-        IReadOnlySet<string> spacingTokens)
+        IReadOnlySet<string> spacingTokens,
+        IReadOnlySet<string> radiusTokens)
     {
         if (string.IsNullOrWhiteSpace(settingValue))
         {
@@ -69,7 +74,7 @@ public sealed class DesignTokenStyleRenderer : IDesignTokenStyleRenderer
         {
             TokenValueKind.Color => ResolveTokenValue(colorTokens, settingValue),
             TokenValueKind.Spacing => ResolveSpacingTokenValue(spacingTokens, settingValue),
-            TokenValueKind.Radius => ResolveRadiusValue(settingValue),
+            TokenValueKind.Radius => ResolveRadiusTokenValue(radiusTokens, settingValue),
             TokenValueKind.Raw => settingValue,
             _ => null
         };
@@ -92,6 +97,7 @@ public sealed class DesignTokenStyleRenderer : IDesignTokenStyleRenderer
     private static string? ResolveSpacingTokenValue(IReadOnlySet<string> tokens, string tokenAlias)
     {
         if (string.Equals(tokenAlias, "none", StringComparison.OrdinalIgnoreCase) ||
+            string.Equals(tokenAlias, "0", StringComparison.OrdinalIgnoreCase) ||
             string.Equals(tokenAlias, "space-none", StringComparison.OrdinalIgnoreCase))
         {
             return "0";
@@ -102,17 +108,17 @@ public sealed class DesignTokenStyleRenderer : IDesignTokenStyleRenderer
             : null;
     }
 
-    private static string? ResolveRadiusValue(string radiusAlias)
+    private static string? ResolveRadiusTokenValue(IReadOnlySet<string> tokens, string tokenAlias)
     {
-        return radiusAlias switch
+        if (string.Equals(tokenAlias, "none", StringComparison.OrdinalIgnoreCase) ||
+            string.Equals(tokenAlias, "radius-none", StringComparison.OrdinalIgnoreCase))
         {
-            "radius-none" => "0",
-            "radius-sm" => "0.375rem",
-            "radius-md" => "0.75rem",
-            "radius-lg" => "1.25rem",
-            "radius-full" => "999px",
-            _ => radiusAlias
-        };
+            return "0";
+        }
+
+        return tokens.Contains(tokenAlias)
+            ? $"var(--{tokenAlias})"
+            : null;
     }
 
     private static string? CombineDeclarations(params string?[] declarations)

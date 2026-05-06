@@ -15,7 +15,7 @@ public sealed class DesignTokenValueDataSource : IContentmentDataSource
         _designTokenProvider = designTokenProvider;
     }
 
-    public string Name => "Design Token Values";
+    public string Name => "Style Setting Values";
 
     public string Description => "Reads value tokens from site settings.";
 

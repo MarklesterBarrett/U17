@@ -48,7 +48,6 @@ public sealed class DesignTokenCssGenerator : IDesignTokenCssGenerator
 
         builder.AppendLine("}");
         AppendSpacingBreakpoint(builder, "48rem", tokens.Spacing, x => x.Tablet);
-        AppendSpacingBreakpoint(builder, "64rem", tokens.Spacing, x => x.Laptop);
         AppendSpacingBreakpoint(builder, "80rem", tokens.Spacing, x => x.Desktop);
 
         return builder.ToString();

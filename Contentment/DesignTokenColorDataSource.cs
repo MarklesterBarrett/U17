@@ -15,7 +15,7 @@ public sealed class DesignTokenColorDataSource : IContentmentDataSource
         _designTokenProvider = designTokenProvider;
     }
 
-    public string Name => "Design Token Colors";
+    public string Name => "Style Setting Colours";
 
     public string Description => "Reads color tokens from site settings.";
 

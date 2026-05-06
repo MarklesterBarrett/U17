@@ -15,7 +15,6 @@ public sealed record SpacingTokenDefinition(
     string Label,
     string Mobile,
     string Tablet,
-    string Laptop,
     string Desktop);
 
 public sealed record ValueTokenDefinition(

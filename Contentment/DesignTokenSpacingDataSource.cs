@@ -13,7 +13,7 @@ public sealed class DesignTokenSpacingDataSource : IContentmentDataSource
         _designTokenProvider = designTokenProvider;
     }
 
-    public string Name => "Design Token Spacing";
+    public string Name => "Style Setting Spacing";
 
     public string Description => "Reads spacing tokens from site settings.";
 
@@ -36,7 +36,7 @@ public sealed class DesignTokenSpacingDataSource : IContentmentDataSource
             {
                 Name = x.Label,
                 Value = x.Alias,
-                Description = $"{x.Mobile} / {x.Tablet} / {x.Laptop} / {x.Desktop}"
+                Description = $"{x.Mobile} / {x.Tablet} / {x.Desktop}"
             });
     }
 }

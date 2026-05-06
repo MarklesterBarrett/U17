@@ -1,7 +1,7 @@
 {
   "$schema": "../../umbraco-package-schema.json",
-  "name": "My.DesignTokens",
-  "version": "1.0.0",
+  "name": "My.ThemeSettings",
+  "version": "1.0.1",
   "extensions": [
     {
       "type": "propertyEditorUi",
@@ -15,6 +15,46 @@
         "group": "common",
         "propertyEditorSchemaAlias": "Umbraco.Plain.String"
       }
+    },
+    {
+      "type": "propertyEditorUi",
+      "alias": "My.PropertyEditorUi.ResponsiveSpacingValue",
+      "name": "Responsive Spacing Value",
+      "element": "/App_Plugins/DesignTokens/responsive-spacing-value.element.js",
+      "elementName": "my-responsive-spacing-value",
+      "meta": {
+        "label": "Responsive Spacing Value",
+        "icon": "icon-ruler",
+        "group": "common",
+        "propertyEditorSchemaAlias": "Umbraco.Plain.String"
+      }
+    },
+    {
+      "type": "blockEditorCustomView",
+      "alias": "My.BlockEditorCustomView.BuiltInBaseColor",
+      "name": "Built-in Base Color View",
+      "element": "/App_Plugins/DesignTokens/primitive-color-block-view.element.js",
+      "elementName": "my-base-color-block-view",
+      "forContentTypeAlias": "colorToken",
+      "forBlockEditor": "block-list"
+    },
+    {
+      "type": "blockEditorCustomView",
+      "alias": "My.BlockEditorCustomView.CustomBaseColor",
+      "name": "Custom Base Color View",
+      "element": "/App_Plugins/DesignTokens/primitive-color-block-view.element.js",
+      "elementName": "my-base-color-block-view",
+      "forContentTypeAlias": "customColorToken",
+      "forBlockEditor": "block-list"
+    },
+    {
+      "type": "blockEditorCustomView",
+      "alias": "My.BlockEditorCustomView.SpacingToken",
+      "name": "Spacing View",
+      "element": "/App_Plugins/DesignTokens/spacing-token-block-view.element.js",
+      "elementName": "my-spacing-token-block-view",
+      "forContentTypeAlias": "spacing",
+      "forBlockEditor": "block-list"
     }
   ]
 }

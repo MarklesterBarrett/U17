@@ -34,6 +34,12 @@
   --shadow-card: var(--shadow-raised);
   --shadow-popover: var(--shadow-lifted);
 
+  --spacing-xs: var(--space-xs);
+  --spacing-sm: var(--space-sm);
+  --spacing-md: var(--space-md);
+  --spacing-lg: var(--space-lg);
+  --spacing-xl: var(--space-xl);
+  --spacing-2xl: var(--space-2xl);
   --spacing-gutter: var(--layout-gutter);
   --spacing-section: var(--space-xl);
   --spacing-stack: var(--space-md);
