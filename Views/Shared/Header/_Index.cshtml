@@ -29,7 +29,7 @@
 
     @await Html.PartialAsync("~/Views/Shared/Header/_UtilityBar.cshtml", utilityBarBlock)
 
-    <div class="mx-auto grid w-full max-w-[var(--layout-width-content)] gap-4 px-gutter py-4 lg:grid-cols-[auto_auto] lg:justify-between lg:items-center">
+    <div class="mx-auto grid w-full max-w-[var(--layout-width-container)] gap-4 px-gutter py-4 lg:grid-cols-[auto_auto] lg:justify-between lg:items-center">
         <div class="grid grid-cols-[1fr_auto] items-center gap-4 lg:grid-cols-1">
             @await Html.PartialAsync("~/Views/Shared/Header/_LogoHeader.cshtml", (siteName, logoHeader))
 

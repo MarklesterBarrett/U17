@@ -174,10 +174,13 @@ class MyContentmentColorSwatches extends HTMLElement {
 
         .grid {
           display: grid;
-          grid-template-columns: 72px repeat(var(--shade-count), 22px);
-          gap: 2px;
+          grid-template-columns: 72px repeat(var(--shade-count), 32px);
+          gap: 4px;
           align-items: center;
           min-width: fit-content;
+        }
+        .grid + .grid {
+          margin-top: 4px;
         }
 
         .custom-grid {
@@ -189,7 +192,7 @@ class MyContentmentColorSwatches extends HTMLElement {
         }
 
         .label__color{
-          font-size: 10px;
+          font-size: 11px;
           line-height: 1;
         }
 
@@ -204,8 +207,8 @@ class MyContentmentColorSwatches extends HTMLElement {
 
         button.swatch {
           display: block;
-          width: 22px;
-          height: 22px;
+          width: 32px;
+          height: 32px;
           cursor: pointer;
           box-sizing: border-box;
           margin: 0;
@@ -230,9 +233,7 @@ class MyContentmentColorSwatches extends HTMLElement {
       </style>
     `;
 
-    this.shadowRoot.innerHTML = mode === "list"
-      ? `${style}${this.renderList(items)}`
-      : `${style}${this.renderGrid(items)}`;
+    this.shadowRoot.innerHTML = mode === "list" ? `${style}${this.renderList(items)}` : `${style}${this.renderGrid(items)}`;
 
     this.shadowRoot.querySelector("button.primitive-colour:not(.custom-swatch)")?.addEventListener("click", () => {
       this.setOpen(!this._isOpen);
@@ -249,10 +250,10 @@ class MyContentmentColorSwatches extends HTMLElement {
     const groupedItems = this.groupItems(items);
     const shadeGroups = groupedItems.filter((group) => group.items.some((item) => item.shade));
     const customItems = groupedItems.flatMap((group) => group.items.filter((item) => !item.shade));
+    const standaloneSwatchItems = customItems.filter((item) => this.isStandaloneSwatchItem(item));
+    const labeledCustomItems = customItems.filter((item) => !this.isStandaloneSwatchItem(item));
     const shades = this.getShades(shadeGroups);
-    const gridTop = shades.length
-      ? ['<div class="label__color"></div>', ...shades.map((shade) => `<div class="label__color text-center">${this.escapeHtml(shade)}</div>`)].join("")
-      : "";
+    const gridTop = shades.length ? ['<div class="label__color"></div>', ...shades.map((shade) => `<div class="label__color text-center">${this.escapeHtml(shade)}</div>`)].join("") : "";
 
     const gridHtml = shadeGroups
       .map((group) => {
@@ -286,7 +287,29 @@ class MyContentmentColorSwatches extends HTMLElement {
       })
       .join("");
 
-    const customHtml = customItems
+    const standaloneGridHtml = standaloneSwatchItems
+      .sort((left, right) => this.getStandaloneSwatchOrder(left) - this.getStandaloneSwatchOrder(right))
+      .map((item) => {
+        const alias = item.value || "";
+        const selected = alias === this._value ? "selected" : "";
+        const swatchColor = item.description || "transparent";
+        const title = this.getItemTitle(item, selected);
+
+        return `
+          <div class="label__color text-right">${this.escapeHtml(item.name || alias)}</div>
+          <button
+            class="swatch ${selected}"
+            type="button"
+            data-value="${this.escapeAttr(alias)}"
+            aria-label="${this.escapeAttr(title)}"
+            title="${this.escapeAttr(title)}"
+            style="background:${this.escapeAttr(swatchColor)}">
+          </button>
+        `;
+      })
+      .join("");
+
+    const customHtml = labeledCustomItems
       .map((item) => {
         const alias = item.value || "";
         const selected = alias === this._value ? "selected" : "";
@@ -308,9 +331,10 @@ class MyContentmentColorSwatches extends HTMLElement {
       .join("");
 
     const palette = shades.length ? `<div class="grid" style="--shade-count:${shades.length}">${gridTop}${gridHtml}</div>` : "";
+    const standalonePalette = standaloneSwatchItems.length ? `<div class="grid" style="--shade-count:1">${standaloneGridHtml}</div>` : "";
     const customPalette = customHtml ? `<div class="custom-grid">${customHtml}</div>` : "";
 
-    return `${palette}${customPalette}`;
+    return `${palette}${standalonePalette}${customPalette}`;
   }
 
   renderList(items) {
@@ -363,8 +387,7 @@ class MyContentmentColorSwatches extends HTMLElement {
   resolveCssColor(value) {
     const trimmed = String(value || "").trim();
 
-    if (/^#(?:[0-9a-f]{3,4}|[0-9a-f]{6}|[0-9a-f]{8})$/i.test(trimmed) ||
-        /^(?:rgb|rgba|hsl|hsla|oklch|oklab|lab|lch)\(/i.test(trimmed)) {
+    if (/^#(?:[0-9a-f]{3,4}|[0-9a-f]{6}|[0-9a-f]{8})$/i.test(trimmed) || /^(?:rgb|rgba|hsl|hsla|oklch|oklab|lab|lch)\(/i.test(trimmed)) {
       return trimmed;
     }
 
@@ -374,9 +397,7 @@ class MyContentmentColorSwatches extends HTMLElement {
   getItemTitle(item, selected) {
     const name = item.name || "";
     const alias = item.value || "";
-    const label = name && alias && name.toLowerCase() !== alias.toLowerCase()
-      ? `${name} (${alias})`
-      : name || alias;
+    const label = name && alias && name.toLowerCase() !== alias.toLowerCase() ? `${name} (${alias})` : name || alias;
 
     return `${label}${selected ? " - selected" : ""}`;
   }
@@ -388,9 +409,7 @@ class MyContentmentColorSwatches extends HTMLElement {
       return name && value && name.toLowerCase() === value.toLowerCase();
     });
 
-    return selectableBaseItems.length === items.length && items.length > 0
-      ? "list"
-      : "grid";
+    return selectableBaseItems.length === items.length && items.length > 0 ? "list" : "grid";
   }
 
   groupItems(items) {
@@ -437,6 +456,28 @@ class MyContentmentColorSwatches extends HTMLElement {
 
   toTitleCase(value) {
     return value.replace(/\b[a-z]/g, (letter) => letter.toUpperCase());
+  }
+
+  isStandaloneSwatchItem(item) {
+    const alias = String(item.value || "")
+      .trim()
+      .toLowerCase();
+    return alias === "black" || alias === "white";
+  }
+
+  getStandaloneSwatchOrder(item) {
+    const alias = String(item.value || "")
+      .trim()
+      .toLowerCase();
+    if (alias === "white") {
+      return 0;
+    }
+
+    if (alias === "black") {
+      return 1;
+    }
+
+    return 99;
   }
 }
 

@@ -43,6 +43,19 @@
       }
     },
     {
+      "type": "propertyEditorUi",
+      "alias": "My.PropertyEditorUi.StyleValue",
+      "name": "Style Value",
+      "element": "/App_Plugins/DesignTokens/style-value.element.js",
+      "elementName": "my-style-value",
+      "meta": {
+        "label": "Style Value",
+        "icon": "icon-ruler-alt",
+        "group": "common",
+        "propertyEditorSchemaAlias": "Umbraco.Plain.String"
+      }
+    },
+    {
       "type": "blockEditorCustomView",
       "alias": "My.BlockEditorCustomView.BuiltInBaseColor",
       "name": "Built-in Base Color View",

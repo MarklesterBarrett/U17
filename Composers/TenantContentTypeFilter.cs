@@ -22,6 +22,7 @@ public sealed class TenantContentTypeFilter : IContentTypeFilter
     private const string SiteHeaderSettingsAlias = "siteHeaderSettings";
     private const string SiteFooterSettingsAlias = "siteFooterSettings";
     private const string SiteThemeSettingsAlias = "siteThemeSettings";
+    private const string AppliedThemeStylesAlias = "appliedThemeStyles";
 
     public Task<IEnumerable<T>> FilterAllowedAtRootAsync<T>(IEnumerable<T> contentTypes)
         where T : IContentTypeComposition
@@ -52,7 +53,8 @@ public sealed class TenantContentTypeFilter : IContentTypeFilter
                 string.Equals(x.Alias, SiteIdentitySettingsAlias, StringComparison.Ordinal) ||
                 string.Equals(x.Alias, SiteHeaderSettingsAlias, StringComparison.Ordinal) ||
                 string.Equals(x.Alias, SiteFooterSettingsAlias, StringComparison.Ordinal) ||
-                string.Equals(x.Alias, SiteThemeSettingsAlias, StringComparison.Ordinal));
+                string.Equals(x.Alias, SiteThemeSettingsAlias, StringComparison.Ordinal) ||
+                string.Equals(x.Alias, AppliedThemeStylesAlias, StringComparison.Ordinal));
 
             return Task.FromResult(filtered);
         }

@@ -22,6 +22,9 @@ public interface ISiteSettingsResolver
     IPublishedContent? GetThemeSettings();
     IPublishedContent? GetThemeSettings(IPublishedContent? content);
     IPublishedContent? GetThemeSettings(Guid tenantKey);
+    IPublishedContent? GetAppliedThemeStyles();
+    IPublishedContent? GetAppliedThemeStyles(IPublishedContent? content);
+    IPublishedContent? GetAppliedThemeStyles(Guid tenantKey);
 }
 
 public sealed class SiteSettingsResolver : ISiteSettingsResolver
@@ -31,6 +34,7 @@ public sealed class SiteSettingsResolver : ISiteSettingsResolver
     private const string HeaderSettingsAlias = "siteHeaderSettings";
     private const string FooterSettingsAlias = "siteFooterSettings";
     private const string ThemeSettingsAlias = "siteThemeSettings";
+    private const string AppliedThemeStylesAlias = "appliedThemeStyles";
     private readonly IServiceScopeFactory _serviceScopeFactory;
     private readonly IUmbracoContextAccessor _umbracoContextAccessor;
 
@@ -116,6 +120,14 @@ public sealed class SiteSettingsResolver : ISiteSettingsResolver
 
     public IPublishedContent? GetThemeSettings(Guid tenantKey) =>
         GetSectionSettings(tenantKey, ThemeSettingsAlias);
+
+    public IPublishedContent? GetAppliedThemeStyles() => GetSectionSettings(AppliedThemeStylesAlias);
+
+    public IPublishedContent? GetAppliedThemeStyles(IPublishedContent? content) =>
+        GetSectionSettings(content, AppliedThemeStylesAlias);
+
+    public IPublishedContent? GetAppliedThemeStyles(Guid tenantKey) =>
+        GetSectionSettings(tenantKey, AppliedThemeStylesAlias);
 
     private static IPublishedContent? GetSiteSettingsFromTenantRoot(IPublishedContent? tenantRoot)
     {

@@ -22,19 +22,25 @@ class MyResponsiveSpacingValue extends HTMLElement {
   constructor() {
     super();
     this._value = {};
+    this._hasRendered = false;
     this.attachShadow({ mode: "open" });
   }
 
   set value(value) {
     this._value = this.parseValue(value);
+    if (this._hasRendered) {
+      this.syncInputs();
+      return;
+    }
+
     this.render();
   }
 
   get value() {
     const value = {
-      mobile: this._value.mobile || "",
-      tablet: this._value.tablet || "",
-      desktop: this._value.desktop || "",
+      mobile: this.toCssPixelValue(this._value.mobile),
+      tablet: this.toCssPixelValue(this._value.tablet),
+      desktop: this.toCssPixelValue(this._value.desktop),
     };
 
     return Object.values(value).some((fieldValue) => String(fieldValue).trim())
@@ -47,13 +53,14 @@ class MyResponsiveSpacingValue extends HTMLElement {
   }
 
   updateValue(alias, value) {
+    const sanitizedValue = this.sanitizeNumericValue(value);
+
     this._value = {
       ...this._value,
-      [alias]: value,
+      [alias]: sanitizedValue,
     };
 
     this.dispatchEvent(new UmbChangeEvent());
-    this.render();
   }
 
   parseValue(value) {
@@ -62,12 +69,22 @@ class MyResponsiveSpacingValue extends HTMLElement {
     }
 
     if (typeof value === "object") {
-      return value;
+      return {
+        mobile: this.sanitizeNumericValue(value.mobile),
+        tablet: this.sanitizeNumericValue(value.tablet),
+        desktop: this.sanitizeNumericValue(value.desktop),
+      };
     }
 
     try {
       const parsed = JSON.parse(value);
-      return parsed && typeof parsed === "object" ? parsed : {};
+      return parsed && typeof parsed === "object"
+        ? {
+            mobile: this.sanitizeNumericValue(parsed.mobile),
+            tablet: this.sanitizeNumericValue(parsed.tablet),
+            desktop: this.sanitizeNumericValue(parsed.desktop),
+          }
+        : {};
     } catch {
       return {};
     }
@@ -75,6 +92,11 @@ class MyResponsiveSpacingValue extends HTMLElement {
 
   render() {
     if (!this.shadowRoot) {
+      return;
+    }
+
+    if (this._hasRendered) {
+      this.syncInputs();
       return;
     }
 
@@ -138,6 +160,18 @@ class MyResponsiveSpacingValue extends HTMLElement {
           box-shadow: 0 0 0 1px #3879ff;
           outline: 0;
         }
+
+        .input-wrap {
+          display: inline-flex;
+          align-items: center;
+          gap: 4px;
+        }
+
+        .suffix {
+          color: #5c6370;
+          font-size: 12px;
+          line-height: 1;
+        }
       </style>
       <div class="spacing-value">
         ${fields.map((field) => this.renderField(field)).join("")}
@@ -146,8 +180,38 @@ class MyResponsiveSpacingValue extends HTMLElement {
 
     this.shadowRoot.querySelectorAll("input").forEach((input) => {
       input.addEventListener("input", () => {
-        this.updateValue(input.getAttribute("data-alias") || "", input.value);
+        const sanitizedValue = this.sanitizeNumericValue(input.value);
+
+        if (input.value !== sanitizedValue) {
+          input.value = sanitizedValue;
+        }
+
+        this.updateValue(input.getAttribute("data-alias") || "", sanitizedValue);
       });
+    });
+
+    this._hasRendered = true;
+    this.syncInputs();
+  }
+
+  syncInputs() {
+    if (!this.shadowRoot) {
+      return;
+    }
+
+    const activeElement = this.shadowRoot.activeElement;
+
+    this.shadowRoot.querySelectorAll("input").forEach((input) => {
+      if (input === activeElement) {
+        return;
+      }
+
+      const alias = input.getAttribute("data-alias") || "";
+      const nextValue = this._value[alias] || "";
+
+      if (input.value !== nextValue) {
+        input.value = nextValue;
+      }
     });
   }
 
@@ -158,14 +222,43 @@ class MyResponsiveSpacingValue extends HTMLElement {
       <label>
         ${field.icon}
         <span class="sr-only">${field.label} *</span>
-        <input
-          type="text"
-          required
-          data-alias="${field.alias}"
-          value="${this.escapeAttr(value)}"
-          autocomplete="off">
+        <span class="input-wrap">
+          <input
+            type="text"
+            inputmode="decimal"
+            required
+            data-alias="${field.alias}"
+            value="${this.escapeAttr(value)}"
+            autocomplete="off">
+          ${field.alias === "desktop" ? '<span class="suffix">px</span>' : ""}
+        </span>
       </label>
     `;
+  }
+
+  sanitizeNumericValue(value) {
+    const input = String(value ?? "");
+    let sawDecimalPoint = false;
+    let result = "";
+
+    for (const character of input) {
+      if (character >= "0" && character <= "9") {
+        result += character;
+        continue;
+      }
+
+      if (character === "." && !sawDecimalPoint) {
+        result += character;
+        sawDecimalPoint = true;
+      }
+    }
+
+    return result;
+  }
+
+  toCssPixelValue(value) {
+    const normalized = this.sanitizeNumericValue(value);
+    return normalized ? `${normalized}px` : "";
   }
 
   escapeAttr(value) {

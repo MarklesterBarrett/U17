@@ -284,7 +284,9 @@
     "olive-700":  "oklch(39.4% 0.023 107.4)",
     "olive-800":  "oklch(28.6% 0.016 107.4)",
     "olive-900":  "oklch(22.8% 0.013 107.4)",
-    "olive-950":  "oklch(15.3% 0.006 107.1)"
+    "olive-950":  "oklch(15.3% 0.006 107.1)",
+    "black":  "#000000",
+    "white":  "#FFFFFF"
 };
 
 class MyBaseColorBlockView extends HTMLElement {
@@ -318,7 +320,9 @@ class MyBaseColorBlockView extends HTMLElement {
   }
 
   render() {
-    const alias = this.normalizeAlias(this.readValue(this.content, "paletteValue") || this.readValue(this.content, "label"));
+    const paletteValue = this.readValue(this.content, "paletteValue");
+    const customLabel = this.readValue(this.content, "label");
+    const alias = this.normalizeAlias(paletteValue || customLabel);
     const customValue = this.readValue(this.content, "customValue");
     const color = customValue || PRIMITIVE_COLORS[alias] || "transparent";
     const label = alias || "Select a colour";
@@ -367,7 +371,7 @@ class MyBaseColorBlockView extends HTMLElement {
   }
 
   readValue(source, alias) {
-    const value = source?.[alias];
+    const value = source?.[alias] ?? this.readValueFromCollection(source?.values, alias) ?? this.readValueFromCollection(source?.properties, alias);
 
     if (Array.isArray(value)) {
       return this.readValue({ value: value[0] }, "value");
@@ -382,6 +386,19 @@ class MyBaseColorBlockView extends HTMLElement {
     }
 
     return "";
+  }
+
+  readValueFromCollection(collection, alias) {
+    if (!Array.isArray(collection)) {
+      return undefined;
+    }
+
+    const entry = collection.find((item) => {
+      const itemAlias = item?.alias || item?.propertyAlias || item?.editorAlias;
+      return itemAlias === alias;
+    });
+
+    return entry?.value;
   }
 
   normalizeAlias(value) {

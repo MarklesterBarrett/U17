@@ -292,7 +292,9 @@ public sealed class BuiltInBaseColorDataSource : IContentmentDataSource
         new("Olive 700", "olive-700", "oklch(39.4% 0.023 107.4)"),
         new("Olive 800", "olive-800", "oklch(28.6% 0.016 107.4)"),
         new("Olive 900", "olive-900", "oklch(22.8% 0.013 107.4)"),
-        new("Olive 950", "olive-950", "oklch(15.3% 0.006 107.1)")
+        new("Olive 950", "olive-950", "oklch(15.3% 0.006 107.1)"),
+        new("Black", "black", "#000000"),
+        new("White", "white", "#FFFFFF")
     ];
 
     public string Name => "Built-in Base Colours";

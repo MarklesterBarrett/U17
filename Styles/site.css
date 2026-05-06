@@ -9,10 +9,11 @@
 
 @theme inline {
   --color-page: var(--surface-page);
-  --color-panel: var(--surface-panel);
-  --color-panel-muted: var(--surface-panel-muted);
+  --color-panel: var(--surface-card);
+  --color-panel-muted: var(--surface-section);
   --color-header: var(--surface-header);
   --color-footer: var(--surface-footer);
+  --color-border-default: var(--border-default);
   --color-border-subtle: var(--border-subtle);
   --color-border-strong: var(--border-strong);
   --color-text-default: var(--text-default);
@@ -27,11 +28,9 @@
   --font-sans: var(--font-family-sans);
   --font-display: var(--font-family-display);
 
-  --radius-card: var(--radius-lg);
   --radius-control: var(--radius-md);
   --radius-button: var(--radius-full);
 
-  --shadow-card: var(--shadow-md);
   --shadow-popover: var(--shadow-xl);
 
   --spacing-xs: var(--space-xs);
@@ -41,7 +40,7 @@
   --spacing-xl: var(--space-xl);
   --spacing-2xl: var(--space-2xl);
   --spacing-gutter: var(--layout-gutter);
-  --spacing-section: var(--space-xl);
+  --spacing-section: var(--space-section);
   --spacing-stack: var(--space-md);
 }
 
@@ -72,12 +71,12 @@
   }
 
   a {
-    color: var(--action-primary-bg);
+    color: var(--link-color);
     transition: color 160ms cubic-bezier(0.2, 0.8, 0.2, 1);
   }
 
   a:hover {
-    color: var(--action-primary-bg-hover);
+    color: var(--link-hover-color);
   }
 
   :focus-visible {
@@ -113,5 +112,19 @@
     display: grid;
     gap: var(--space-sm);
     grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+  }
+
+  .rounded-card {
+    border-radius: var(--radius-card);
+  }
+
+  .shadow-card {
+    --tw-shadow: var(--shadow-card);
+    box-shadow:
+      var(--tw-inset-shadow),
+      var(--tw-inset-ring-shadow),
+      var(--tw-ring-offset-shadow),
+      var(--tw-ring-shadow),
+      var(--tw-shadow);
   }
 }
