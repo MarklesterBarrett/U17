@@ -14,9 +14,14 @@ public sealed class TenantContentTypeFilterComposer : IComposer
 public sealed class TenantContentTypeFilter : IContentTypeFilter
 {
     private static readonly Guid TenantSiteKey = new("b2142119-0dfb-4a8f-a371-775fefcf7598");
+    private static readonly Guid SiteSettingsKey = new("88c20fb1-fbed-41fb-b7e7-23fa8b13db89");
     private const string TenantSiteAlias = "tenantSite";
     private const string PageAlias = "page";
     private const string SiteSettingsAlias = "siteSettings";
+    private const string SiteIdentitySettingsAlias = "siteIdentitySettings";
+    private const string SiteHeaderSettingsAlias = "siteHeaderSettings";
+    private const string SiteFooterSettingsAlias = "siteFooterSettings";
+    private const string SiteThemeSettingsAlias = "siteThemeSettings";
 
     public Task<IEnumerable<T>> FilterAllowedAtRootAsync<T>(IEnumerable<T> contentTypes)
         where T : IContentTypeComposition
@@ -37,6 +42,17 @@ public sealed class TenantContentTypeFilter : IContentTypeFilter
             var filtered = contentTypes.Where(x =>
                 string.Equals(x.Alias, PageAlias, StringComparison.Ordinal) ||
                 string.Equals(x.Alias, SiteSettingsAlias, StringComparison.Ordinal));
+
+            return Task.FromResult(filtered);
+        }
+
+        if (parentContentTypeKey == SiteSettingsKey)
+        {
+            var filtered = contentTypes.Where(x =>
+                string.Equals(x.Alias, SiteIdentitySettingsAlias, StringComparison.Ordinal) ||
+                string.Equals(x.Alias, SiteHeaderSettingsAlias, StringComparison.Ordinal) ||
+                string.Equals(x.Alias, SiteFooterSettingsAlias, StringComparison.Ordinal) ||
+                string.Equals(x.Alias, SiteThemeSettingsAlias, StringComparison.Ordinal));
 
             return Task.FromResult(filtered);
         }

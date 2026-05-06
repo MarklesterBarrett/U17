@@ -49,6 +49,8 @@ public sealed class DesignTokenCssGenerator : IDesignTokenCssGenerator
         builder.AppendLine("}");
         AppendSpacingBreakpoint(builder, "48rem", tokens.Spacing, x => x.Tablet);
         AppendSpacingBreakpoint(builder, "80rem", tokens.Spacing, x => x.Desktop);
+        AppendValueBreakpoint(builder, "48rem", tokens.Values, x => x.Tablet);
+        AppendValueBreakpoint(builder, "80rem", tokens.Values, x => x.Desktop);
 
         return builder.ToString();
     }
@@ -70,6 +72,40 @@ public sealed class DesignTokenCssGenerator : IDesignTokenCssGenerator
                 .Append(spacing.Alias)
                 .Append(": ")
                 .Append(valueSelector(spacing))
+                .AppendLine(";");
+        }
+
+        builder.AppendLine("  }");
+        builder.AppendLine("}");
+    }
+
+    private static void AppendValueBreakpoint(
+        StringBuilder builder,
+        string minWidth,
+        IReadOnlyList<ValueTokenDefinition> tokens,
+        Func<ValueTokenDefinition, string> valueSelector)
+    {
+        var responsiveTokens = tokens
+            .Where(token => !string.IsNullOrWhiteSpace(valueSelector(token)))
+            .OrderBy(token => token.Alias, StringComparer.OrdinalIgnoreCase)
+            .ToList();
+
+        if (responsiveTokens.Count == 0)
+        {
+            return;
+        }
+
+        builder.Append("@media (min-width: ")
+            .Append(minWidth)
+            .AppendLine(") {");
+        builder.AppendLine("  :root {");
+
+        foreach (var value in responsiveTokens)
+        {
+            builder.Append("    --")
+                .Append(value.Alias)
+                .Append(": ")
+                .Append(valueSelector(value))
                 .AppendLine(";");
         }
 

@@ -2,8 +2,13 @@
 @using Umbraco.Cms.Core.Models.Blocks
 @{
     var siteSettings = ViewData["SiteSettings"] as Umbraco.Cms.Core.Models.PublishedContent.IPublishedContent;
-    var siteName = siteSettings?.Value<string>("siteName") ?? "Site";
-    var headerBlock = siteSettings?.Value<BlockListItem>("header");
+    var siteIdentitySettings = ViewData["SiteIdentitySettings"] as Umbraco.Cms.Core.Models.PublishedContent.IPublishedContent;
+    var headerSettings = ViewData["HeaderSettings"] as Umbraco.Cms.Core.Models.PublishedContent.IPublishedContent;
+    var siteName = siteIdentitySettings?.Value<string>("siteName")
+        ?? siteSettings?.Value<string>("siteName")
+        ?? "Site";
+    var headerBlock = headerSettings?.Value<BlockListItem>("header")
+        ?? siteSettings?.Value<BlockListItem>("header");
     @if (headerBlock is null)
     {   
         return;
@@ -48,4 +53,3 @@
         @await Html.PartialAsync("~/Views/Shared/Header/_NavigationBar.cshtml", navigationBarBlock)
     </div>
 </header>
-

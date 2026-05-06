@@ -8,23 +8,18 @@ namespace Site.DesignTokens;
 public sealed class CmsDesignTokenProvider : IDesignTokenProvider
 {
     private const string StyleSettingsAlias = "styleSettings";
-    private const string LegacyDesignTokensAlias = "designTokens";
     private const string BaseColorsAlias = "baseColors";
-    private const string BaseColorItemsAlias = "colours";
-    private const string LegacyPrimitiveColorsAlias = "primitiveColors";
     private const string SemanticColorsAlias = "semanticColors";
-    private const string SpacingsAlias = "spacings";
     private const string SpacingTokensAlias = "spacingTokens";
     private const string BaseColorAliasProperty = "baseColorAlias";
-    private const string LegacyPrimitiveAliasProperty = "primitiveAlias";
     private static readonly IReadOnlyList<(string PropertyAlias, string TokenAlias, string Label)> CoreSpacingProperties =
     [
-        ("spacingXs", "space-xs", "xs"),
-        ("spacingSm", "space-sm", "sm"),
-        ("spacingMd", "space-md", "md"),
-        ("spacingLg", "space-lg", "lg"),
-        ("spacingXl", "space-xl", "xl"),
-        ("spacing2Xl", "space-2xl", "2xl")
+        ("spacingXs", "space-xs", "Tight"),
+        ("spacingSm", "space-sm", "Compact"),
+        ("spacingMd", "space-md", "Comfortable"),
+        ("spacingLg", "space-lg", "Spacious"),
+        ("spacingXl", "space-xl", "Large"),
+        ("spacing2Xl", "space-2xl", "Extra large")
     ];
     private static readonly IReadOnlyList<(string PropertyAlias, string TokenAlias, string Label)> FixedColorProperties =
     [
@@ -49,28 +44,58 @@ public sealed class CmsDesignTokenProvider : IDesignTokenProvider
     ];
     private static readonly IReadOnlyList<(string PropertyAlias, string TokenAlias, string Label)> FixedValueProperties =
     [
-        ("radiusSm", "radius-sm", "Small"),
-        ("radiusMd", "radius-md", "Medium"),
-        ("radiusLg", "radius-lg", "Large"),
+        ("radiusSm", "radius-sm", "Subtle"),
+        ("radiusMd", "radius-md", "Standard"),
+        ("radiusLg", "radius-lg", "Prominent"),
         ("radiusFull", "radius-full", "Full"),
-        ("radiusPill", "radius-pill", "Pill"),
-        ("fontFamilySans", "font-family-sans", "Sans Family"),
-        ("fontFamilyDisplay", "font-family-display", "Display Family"),
-        ("fontSizeSm", "font-size-sm", "Small Size"),
-        ("fontSizeBase", "font-size-base", "Base Size"),
-        ("fontSizeLg", "font-size-lg", "Large Size"),
-        ("fontSizeXl", "font-size-xl", "XL Size"),
-        ("fontSize2Xl", "font-size-2xl", "2XL Size"),
+        ("fontFamilySans", "font-family-sans", "Default Font"),
+        ("fontFamilyDisplay", "font-family-display", "Feature Font"),
+        ("fontSizeSm", "font-size-sm", "Small"),
+        ("fontSizeBase", "font-size-base", "Standard"),
+        ("fontSizeLg", "font-size-lg", "Large"),
+        ("fontSizeXl", "font-size-xl", "Heading"),
+        ("fontSize2Xl", "font-size-2xl", "Display"),
         ("lineHeightTight", "line-height-tight", "Tight Line Height"),
         ("lineHeightBase", "line-height-base", "Base Line Height"),
-        ("layoutGutter", "layout-gutter", "Layout Gutter"),
+        ("layoutGutter", "layout-gutter", "Gutter"),
         ("layoutWidthContent", "layout-width-content", "Content Width"),
         ("layoutWidthReading", "layout-width-reading", "Reading Width"),
-        ("layoutHeaderHeight", "layout-header-height", "Header Height"),
-        ("shadowRaised", "shadow-raised", "Raised Shadow"),
-        ("shadowLifted", "shadow-lifted", "Lifted Shadow"),
-        ("shadowFocus", "shadow-focus", "Focus Shadow")
+        ("shadowNone", "shadow-none", "Flat"),
+        ("shadowMd", "shadow-md", "Raised"),
+        ("shadowXl", "shadow-xl", "Lifted")
     ];
+    private static readonly HashSet<string> TypographyPropertyAliases =
+    [
+        "fontFamilySans",
+        "fontFamilyDisplay",
+        "fontSizeSm",
+        "fontSizeBase",
+        "fontSizeLg",
+        "fontSizeXl",
+        "fontSize2Xl",
+        "lineHeightTight",
+        "lineHeightBase"
+    ];
+    private static readonly HashSet<string> ThemeTopLevelValueAliases =
+    [
+        "layoutGutter",
+        "layoutWidthContent",
+        "layoutWidthReading",
+        "radiusSm",
+        "radiusMd",
+        "radiusLg",
+        "radiusFull",
+        "shadowNone",
+        "shadowMd",
+        "shadowXl"
+    ];
+    private static readonly IReadOnlyDictionary<string, string> FontFamilyPresetValues =
+        new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+        {
+            ["sans"] = "ui-sans-serif, system-ui, sans-serif",
+            ["serif"] = "ui-serif, Georgia, Cambria, \"Times New Roman\", Times, serif",
+            ["mono"] = "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, \"Liberation Mono\", \"Courier New\", monospace"
+        };
     private readonly ISiteSettingsResolver _siteSettingsResolver;
 
     public CmsDesignTokenProvider(ISiteSettingsResolver siteSettingsResolver)
@@ -81,7 +106,8 @@ public sealed class CmsDesignTokenProvider : IDesignTokenProvider
     public DesignTokenSet GetTokens()
     {
         var siteSettings = _siteSettingsResolver.GetSiteSettings();
-        var designTokens = GetDesignTokens(siteSettings);
+        var themeSettings = _siteSettingsResolver.GetThemeSettings();
+        var designTokens = GetDesignTokens(themeSettings, siteSettings);
 
         if (designTokens is null)
         {
@@ -89,15 +115,16 @@ public sealed class CmsDesignTokenProvider : IDesignTokenProvider
         }
 
         return new DesignTokenSet(
-            GetColorTokens(siteSettings, designTokens),
-            GetSpacingTokens(siteSettings),
-            GetValueTokens(designTokens));
+            GetColorTokens(themeSettings, siteSettings, designTokens),
+            GetSpacingTokens(themeSettings, siteSettings),
+            GetValueTokens(themeSettings, siteSettings, designTokens));
     }
 
     public DesignTokenSet GetTokens(Guid tenantKey)
     {
         var siteSettings = _siteSettingsResolver.GetSiteSettings(tenantKey);
-        var designTokens = GetDesignTokens(siteSettings);
+        var themeSettings = _siteSettingsResolver.GetThemeSettings(tenantKey);
+        var designTokens = GetDesignTokens(themeSettings, siteSettings);
 
         if (designTokens is null)
         {
@@ -105,24 +132,27 @@ public sealed class CmsDesignTokenProvider : IDesignTokenProvider
         }
 
         return new DesignTokenSet(
-            GetColorTokens(siteSettings, designTokens),
-            GetSpacingTokens(siteSettings),
-            GetValueTokens(designTokens));
+            GetColorTokens(themeSettings, siteSettings, designTokens),
+            GetSpacingTokens(themeSettings, siteSettings),
+            GetValueTokens(themeSettings, siteSettings, designTokens));
     }
 
-    private static IPublishedElement? GetDesignTokens(IPublishedContent? siteSettings)
+    private static IPublishedElement? GetDesignTokens(IPublishedContent? themeSettings, IPublishedContent? siteSettings)
     {
-        return siteSettings
+        return themeSettings
             ?.Value<BlockListItem>(StyleSettingsAlias)
             ?.Content
             ?? siteSettings
-            ?.Value<BlockListItem>(LegacyDesignTokensAlias)
+            ?.Value<BlockListItem>(StyleSettingsAlias)
             ?.Content;
     }
 
-    private static IReadOnlyList<ColorTokenDefinition> GetColorTokens(IPublishedContent? siteSettings, IPublishedElement designTokens)
+    private static IReadOnlyList<ColorTokenDefinition> GetColorTokens(
+        IPublishedContent? themeSettings,
+        IPublishedContent? siteSettings,
+        IPublishedElement designTokens)
     {
-        var primitiveColors = GetPrimitiveColors(siteSettings, designTokens);
+        var primitiveColors = GetPrimitiveColors(themeSettings, siteSettings, designTokens);
         var semanticColors = GetSemanticColorTokens(designTokens, primitiveColors);
 
         if (semanticColors.Count != 0)
@@ -139,12 +169,12 @@ public sealed class CmsDesignTokenProvider : IDesignTokenProvider
             .ToList();
     }
 
-    private static IReadOnlyDictionary<string, string> GetPrimitiveColors(IPublishedContent? siteSettings, IPublishedElement designTokens)
+    private static IReadOnlyDictionary<string, string> GetPrimitiveColors(
+        IPublishedContent? themeSettings,
+        IPublishedContent? siteSettings,
+        IPublishedElement designTokens)
     {
-        var primitiveColorBlocks = siteSettings
-            ?.Value<BlockListItem>(BaseColorsAlias)
-            ?.Content
-            .Value<IEnumerable<BlockListItem>>(BaseColorItemsAlias);
+        var primitiveColorBlocks = themeSettings?.Value<IEnumerable<BlockListItem>>(BaseColorsAlias);
 
         if (primitiveColorBlocks is null || !primitiveColorBlocks.Any())
         {
@@ -154,11 +184,6 @@ public sealed class CmsDesignTokenProvider : IDesignTokenProvider
         if (primitiveColorBlocks is null || !primitiveColorBlocks.Any())
         {
             primitiveColorBlocks = designTokens.Value<IEnumerable<BlockListItem>>(BaseColorsAlias);
-        }
-
-        if (primitiveColorBlocks is null || !primitiveColorBlocks.Any())
-        {
-            primitiveColorBlocks = designTokens.Value<IEnumerable<BlockListItem>>(LegacyPrimitiveColorsAlias);
         }
 
         return (primitiveColorBlocks ?? Enumerable.Empty<BlockListItem>())
@@ -173,6 +198,74 @@ public sealed class CmsDesignTokenProvider : IDesignTokenProvider
                         !string.IsNullOrWhiteSpace(x.Value))
             .GroupBy(x => x.Alias, StringComparer.OrdinalIgnoreCase)
             .ToDictionary(x => x.Key, x => x.Last().Value, StringComparer.OrdinalIgnoreCase);
+    }
+
+    private static IReadOnlyList<SpacingTokenDefinition> GetSpacingTokens(IPublishedContent? themeSettings, IPublishedContent? siteSettings)
+    {
+        var spacingContainer = themeSettings ?? siteSettings;
+
+        if (spacingContainer is null)
+        {
+            return EnsureZeroSpacingToken([]);
+        }
+
+        var coreTokens = CoreSpacingProperties
+            .Select(definition => CreateCoreSpacingToken(spacingContainer, definition.PropertyAlias, definition.TokenAlias, definition.Label))
+            .Where(token => token is not null)
+            .Select(token => token!)
+            .ToList();
+
+        var additionalTokens = (spacingContainer.Value<IEnumerable<BlockListItem>>(SpacingTokensAlias) ?? Enumerable.Empty<BlockListItem>())
+            .Select(block => block.Content)
+            .Where(content => content is not null)
+            .Select(content => CreateAdditionalSpacingToken(content!))
+            .Where(x => !string.IsNullOrWhiteSpace(x.Alias) &&
+                        !string.IsNullOrWhiteSpace(x.Label) &&
+                        !string.IsNullOrWhiteSpace(x.Mobile) &&
+                        !string.IsNullOrWhiteSpace(x.Tablet) &&
+                        !string.IsNullOrWhiteSpace(x.Desktop))
+            .ToList();
+
+        var tokens = coreTokens
+            .Concat(additionalTokens)
+            .GroupBy(token => token.Alias, StringComparer.OrdinalIgnoreCase)
+            .Select(group => group.First())
+            .ToList();
+
+        return EnsureZeroSpacingToken(tokens);
+    }
+
+    private static IReadOnlyList<ValueTokenDefinition> GetValueTokens(
+        IPublishedContent? themeSettings,
+        IPublishedContent? siteSettings,
+        IPublishedElement designTokens)
+    {
+        var builtInTokens = new[]
+        {
+            new ValueTokenDefinition("radius-none", "None", "0")
+        };
+
+        var typographyContainer = themeSettings ?? siteSettings;
+
+        var fixedTokens = FixedValueProperties
+            .Select(definition => CreateValueTokenDefinition(typographyContainer, designTokens, definition))
+            .Where(token => !string.IsNullOrWhiteSpace(token.Value));
+
+        var additionalTokens = (designTokens.Value<IEnumerable<BlockListItem>>("additionalTokens") ?? Enumerable.Empty<BlockListItem>())
+            .Select(block => block.Content)
+            .Where(content => content is not null)
+            .Select(content => new ValueTokenDefinition(
+                content!.Value<string>("alias")?.Trim() ?? string.Empty,
+                content.Value<string>("label")?.Trim() ?? string.Empty,
+                content.Value<string>("value")?.Trim() ?? string.Empty))
+            .Where(token => !string.IsNullOrWhiteSpace(token.Alias) &&
+                            !string.IsNullOrWhiteSpace(token.Label) &&
+                            !string.IsNullOrWhiteSpace(token.Value));
+
+        return builtInTokens
+            .Concat(fixedTokens)
+            .Concat(additionalTokens)
+            .ToList();
     }
 
     private static IReadOnlyList<ColorTokenDefinition> GetSemanticColorTokens(
@@ -223,11 +316,6 @@ public sealed class CmsDesignTokenProvider : IDesignTokenProvider
     {
         var primitiveAlias = token.Value<string>(BaseColorAliasProperty)?.Trim() ?? string.Empty;
 
-        if (string.IsNullOrWhiteSpace(primitiveAlias))
-        {
-            primitiveAlias = token.Value<string>(LegacyPrimitiveAliasProperty)?.Trim() ?? string.Empty;
-        }
-
         if (!string.IsNullOrWhiteSpace(primitiveAlias) &&
             primitiveColors.TryGetValue(primitiveAlias, out var primitiveValue) &&
             !string.IsNullOrWhiteSpace(primitiveValue))
@@ -255,42 +343,6 @@ public sealed class CmsDesignTokenProvider : IDesignTokenProvider
         return selectedPrimitiveAlias;
     }
 
-    private static IReadOnlyList<SpacingTokenDefinition> GetSpacingTokens(IPublishedContent? siteSettings)
-    {
-        var spacings = siteSettings
-            ?.Value<BlockListItem>(SpacingsAlias)
-            ?.Content;
-
-        if (spacings is null)
-        {
-            return EnsureZeroSpacingToken([]);
-        }
-
-        var coreTokens = CoreSpacingProperties
-            .Select(definition => CreateCoreSpacingToken(spacings, definition.PropertyAlias, definition.TokenAlias, definition.Label))
-            .Where(token => token is not null)
-            .Select(token => token!)
-            .ToList();
-
-        var additionalTokens = (spacings.Value<IEnumerable<BlockListItem>>(SpacingTokensAlias) ?? Enumerable.Empty<BlockListItem>())
-            .Select(block => block.Content)
-            .Where(content => content is not null)
-            .Select(content => CreateAdditionalSpacingToken(content!))
-            .Where(x => !string.IsNullOrWhiteSpace(x.Alias) &&
-                        !string.IsNullOrWhiteSpace(x.Label) &&
-                        !string.IsNullOrWhiteSpace(x.Mobile) &&
-                        !string.IsNullOrWhiteSpace(x.Tablet) &&
-                        !string.IsNullOrWhiteSpace(x.Desktop))
-            .ToList();
-
-        var tokens = coreTokens
-            .Concat(additionalTokens)
-            .GroupBy(token => token.Alias, StringComparer.OrdinalIgnoreCase)
-            .Select(group => group.First())
-            .ToList();
-
-        return EnsureZeroSpacingToken(tokens);
-    }
 
     private static SpacingTokenDefinition CreateAdditionalSpacingToken(IPublishedElement content)
     {
@@ -443,34 +495,128 @@ public sealed class CmsDesignTokenProvider : IDesignTokenProvider
         public static readonly ResponsiveSpacingValue Empty = new(string.Empty, string.Empty, string.Empty);
     }
 
-    private static IReadOnlyList<ValueTokenDefinition> GetValueTokens(IPublishedElement designTokens)
-    {
-        var builtInTokens = new[]
-        {
-            new ValueTokenDefinition("radius-none", "None", "0")
-        };
 
-        var fixedTokens = FixedValueProperties
-            .Select(definition => new ValueTokenDefinition(
+    private static string ResolveFixedValueTokenValue(
+        IPublishedElement? themeSettings,
+        IPublishedElement designTokens,
+        string propertyAlias)
+    {
+        if (TypographyPropertyAliases.Contains(propertyAlias) ||
+            ThemeTopLevelValueAliases.Contains(propertyAlias))
+        {
+            var themeValue = themeSettings?.Value<string>(propertyAlias)?.Trim() ?? string.Empty;
+
+            if (IsFontFamilyProperty(propertyAlias))
+            {
+                themeValue = ResolveFontFamilyValue(themeValue);
+            }
+
+            if (!string.IsNullOrWhiteSpace(themeValue))
+            {
+                return themeValue;
+            }
+        }
+
+        var legacyValue = designTokens.Value<string>(propertyAlias)?.Trim() ?? string.Empty;
+        return IsFontFamilyProperty(propertyAlias)
+            ? ResolveFontFamilyValue(legacyValue)
+            : legacyValue;
+    }
+
+    private static ValueTokenDefinition CreateValueTokenDefinition(
+        IPublishedElement? themeSettings,
+        IPublishedElement designTokens,
+        (string PropertyAlias, string TokenAlias, string Label) definition)
+    {
+        if (IsResponsiveValueProperty(definition.PropertyAlias))
+        {
+            var value = GetResponsiveValue(themeSettings, designTokens, definition.PropertyAlias);
+
+            return new ValueTokenDefinition(
                 definition.TokenAlias,
                 definition.Label,
-                designTokens.Value<string>(definition.PropertyAlias)?.Trim() ?? string.Empty))
-            .Where(token => !string.IsNullOrWhiteSpace(token.Value));
+                value.Mobile,
+                value.Tablet,
+                value.Desktop);
+        }
 
-        var additionalTokens = (designTokens.Value<IEnumerable<BlockListItem>>("additionalTokens") ?? Enumerable.Empty<BlockListItem>())
-            .Select(block => block.Content)
-            .Where(content => content is not null)
-            .Select(content => new ValueTokenDefinition(
-                content!.Value<string>("alias")?.Trim() ?? string.Empty,
-                content.Value<string>("label")?.Trim() ?? string.Empty,
-                content.Value<string>("value")?.Trim() ?? string.Empty))
-            .Where(token => !string.IsNullOrWhiteSpace(token.Alias) &&
-                            !string.IsNullOrWhiteSpace(token.Label) &&
-                            !string.IsNullOrWhiteSpace(token.Value));
+        return new ValueTokenDefinition(
+            definition.TokenAlias,
+            definition.Label,
+            ResolveFixedValueTokenValue(themeSettings, designTokens, definition.PropertyAlias));
+    }
 
-        return builtInTokens
-            .Concat(fixedTokens)
-            .Concat(additionalTokens)
-            .ToList();
+    private static bool IsResponsiveValueProperty(string propertyAlias)
+    {
+        return string.Equals(propertyAlias, "fontSizeSm", StringComparison.Ordinal) ||
+               string.Equals(propertyAlias, "fontSizeBase", StringComparison.Ordinal) ||
+               string.Equals(propertyAlias, "fontSizeLg", StringComparison.Ordinal) ||
+               string.Equals(propertyAlias, "fontSizeXl", StringComparison.Ordinal) ||
+               string.Equals(propertyAlias, "fontSize2Xl", StringComparison.Ordinal) ||
+               string.Equals(propertyAlias, "layoutGutter", StringComparison.Ordinal);
+    }
+
+    private static bool IsFontFamilyProperty(string propertyAlias)
+    {
+        return string.Equals(propertyAlias, "fontFamilySans", StringComparison.Ordinal) ||
+               string.Equals(propertyAlias, "fontFamilyDisplay", StringComparison.Ordinal);
+    }
+
+    private static ResponsiveSpacingValue GetResponsiveValue(
+        IPublishedElement? themeSettings,
+        IPublishedElement designTokens,
+        string propertyAlias)
+    {
+        var themeJson = themeSettings?.Value<string>(propertyAlias)?.Trim() ?? string.Empty;
+
+        if (!string.IsNullOrWhiteSpace(themeJson) &&
+            TryParseResponsiveSpacingValue(themeJson, out var themeValue))
+        {
+            return themeValue;
+        }
+
+        var legacyValue = designTokens.Value<string>(propertyAlias)?.Trim() ?? string.Empty;
+
+        if (!string.IsNullOrWhiteSpace(legacyValue))
+        {
+            return new ResponsiveSpacingValue(legacyValue, legacyValue, legacyValue);
+        }
+
+        return ResponsiveSpacingValue.Empty;
+    }
+
+    private static string ResolveFontFamilyValue(string rawValue)
+    {
+        if (string.IsNullOrWhiteSpace(rawValue))
+        {
+            return string.Empty;
+        }
+
+        try
+        {
+            using var document = JsonDocument.Parse(rawValue);
+            var root = document.RootElement;
+
+            if (root.ValueKind != JsonValueKind.Object)
+            {
+                return rawValue.Trim();
+            }
+
+            var preset = GetJsonString(root, "preset");
+            var customValue = GetJsonString(root, "customValue");
+
+            if (string.Equals(preset, "custom", StringComparison.OrdinalIgnoreCase))
+            {
+                return customValue;
+            }
+
+            return FontFamilyPresetValues.TryGetValue(preset, out var presetValue)
+                ? presetValue
+                : rawValue.Trim();
+        }
+        catch (JsonException)
+        {
+            return rawValue.Trim();
+        }
     }
 }

@@ -3,12 +3,16 @@
 @using Umbraco.Cms.Core.Models.Blocks
 @{
     var siteSettings = ViewData["SiteSettings"] as Umbraco.Cms.Core.Models.PublishedContent.IPublishedContent;
-    var tenantKey = ViewData["TenantKey"] is Guid value ? value : null;
+    var siteIdentitySettings = ViewData["SiteIdentitySettings"] as Umbraco.Cms.Core.Models.PublishedContent.IPublishedContent;
+    Guid? tenantKey = ViewData["TenantKey"] is Guid value ? value : null;
     var pageTitle = ViewData["Title"] as string;
     pageTitle = string.IsNullOrWhiteSpace(pageTitle) ? Model?.Name : pageTitle;
 
-    var siteName = siteSettings?.Value<string>("siteName") ?? string.Empty;
-    var siteTitlePattern = siteSettings?.Value<string>("siteTitle");
+    var siteName = siteIdentitySettings?.Value<string>("siteName")
+        ?? siteSettings?.Value<string>("siteName")
+        ?? string.Empty;
+    var siteTitlePattern = siteIdentitySettings?.Value<string>("siteTitle")
+        ?? siteSettings?.Value<string>("siteTitle");
 
     var metaBlock = Model?.Value<BlockListItem>("meta");
     var metaContent = metaBlock?.Content;

@@ -29,10 +29,10 @@
 
   --radius-card: var(--radius-lg);
   --radius-control: var(--radius-md);
-  --radius-button: var(--radius-pill);
+  --radius-button: var(--radius-full);
 
-  --shadow-card: var(--shadow-raised);
-  --shadow-popover: var(--shadow-lifted);
+  --shadow-card: var(--shadow-md);
+  --shadow-popover: var(--shadow-xl);
 
   --spacing-xs: var(--space-xs);
   --spacing-sm: var(--space-sm);
@@ -83,7 +83,6 @@
   :focus-visible {
     outline: 2px solid var(--focus-ring-color);
     outline-offset: 2px;
-    box-shadow: var(--shadow-focus);
   }
 }
 
@@ -94,7 +93,7 @@
     justify-content: center;
     min-height: 2.75rem;
     padding-inline: var(--space-md);
-    border-radius: var(--radius-pill);
+    border-radius: var(--radius-full);
     background: var(--action-primary-bg);
     color: var(--action-primary-text);
     font-weight: 600;

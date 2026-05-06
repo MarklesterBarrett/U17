@@ -2,7 +2,9 @@
 @using Umbraco.Cms.Core.Models
 @{
     var siteSettings = ViewData["SiteSettings"] as Umbraco.Cms.Core.Models.PublishedContent.IPublishedContent;
-    var favicon = siteSettings?.Value<IPublishedContent>("favicon");
+    var siteIdentitySettings = ViewData["SiteIdentitySettings"] as Umbraco.Cms.Core.Models.PublishedContent.IPublishedContent;
+    var favicon = siteIdentitySettings?.Value<IPublishedContent>("favicon")
+        ?? siteSettings?.Value<IPublishedContent>("favicon");
     var faviconUrl = favicon?.Url();
     var fallback32 = "/assets/favicons/favicon-32x32.png";
     var fallback16 = "/assets/favicons/favicon-16x16.png";

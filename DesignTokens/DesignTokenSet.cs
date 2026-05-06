@@ -20,4 +20,6 @@ public sealed record SpacingTokenDefinition(
 public sealed record ValueTokenDefinition(
     string Alias,
     string Label,
-    string Value);
+    string Value,
+    string Tablet = "",
+    string Desktop = "");

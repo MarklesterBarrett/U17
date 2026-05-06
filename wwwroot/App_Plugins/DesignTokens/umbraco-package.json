@@ -30,6 +30,19 @@
       }
     },
     {
+      "type": "propertyEditorUi",
+      "alias": "My.PropertyEditorUi.FontFamilyValue",
+      "name": "Font Family Value",
+      "element": "/App_Plugins/DesignTokens/font-family-value.element.js",
+      "elementName": "my-font-family-value",
+      "meta": {
+        "label": "Font Family Value",
+        "icon": "icon-text-color",
+        "group": "common",
+        "propertyEditorSchemaAlias": "Umbraco.Plain.String"
+      }
+    },
+    {
       "type": "blockEditorCustomView",
       "alias": "My.BlockEditorCustomView.BuiltInBaseColor",
       "name": "Built-in Base Color View",

@@ -4,14 +4,19 @@
 @using Umbraco.Cms.Core.Strings
 @{
     var siteSettings = ViewData["SiteSettings"] as Umbraco.Cms.Core.Models.PublishedContent.IPublishedContent;
+    var siteIdentitySettings = ViewData["SiteIdentitySettings"] as Umbraco.Cms.Core.Models.PublishedContent.IPublishedContent;
+    var footerSettings = ViewData["FooterSettings"] as Umbraco.Cms.Core.Models.PublishedContent.IPublishedContent;
 
-    var footerBlock = siteSettings?.Value<BlockListItem>("footer");
+    var footerBlock = footerSettings?.Value<BlockListItem>("footer")
+        ?? siteSettings?.Value<BlockListItem>("footer");
     if (footerBlock is null)
     {
         return;
     }
 
-    var siteName = siteSettings?.Value<string>("siteName") ?? "";
+    var siteName = siteIdentitySettings?.Value<string>("siteName")
+        ?? siteSettings?.Value<string>("siteName")
+        ?? "";
     var footerLogoBlock = footerBlock?.Content.Value<BlockListItem>("footerLogo");
     var footerNavigation = footerBlock?.Content.Value<IEnumerable<BlockListItem>>("footerNavigation") ?? Enumerable.Empty<BlockListItem>();
     var socialLinks = footerBlock?.Content.Value<IEnumerable<BlockListItem>>("socialLinks") ?? Enumerable.Empty<BlockListItem>();

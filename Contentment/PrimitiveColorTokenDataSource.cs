@@ -10,9 +10,7 @@ namespace Site.Contentment;
 public sealed class BaseColorDataSource : IContentmentDataSource
 {
     private const string StyleSettingsAlias = "styleSettings";
-    private const string LegacyDesignTokensAlias = "designTokens";
     private const string BaseColorsAlias = "baseColors";
-    private const string LegacyPrimitiveColorsAlias = "primitiveColors";
     private readonly ISiteSettingsResolver _siteSettingsResolver;
 
     public BaseColorDataSource(ISiteSettingsResolver siteSettingsResolver)
@@ -36,12 +34,13 @@ public sealed class BaseColorDataSource : IContentmentDataSource
 
     public IEnumerable<DataListItem> GetItems(Dictionary<string, object> config)
     {
+        var themeSettings = _siteSettingsResolver.GetThemeSettings();
         var siteSettings = _siteSettingsResolver.GetSiteSettings();
-        var primitiveColorBlocks = siteSettings?.Value<IEnumerable<BlockListItem>>(BaseColorsAlias);
+        var primitiveColorBlocks = themeSettings?.Value<IEnumerable<BlockListItem>>(BaseColorsAlias);
 
         if (primitiveColorBlocks is null || !primitiveColorBlocks.Any())
         {
-            primitiveColorBlocks = siteSettings?.Value<IEnumerable<BlockListItem>>(LegacyPrimitiveColorsAlias);
+            primitiveColorBlocks = siteSettings?.Value<IEnumerable<BlockListItem>>(BaseColorsAlias);
         }
 
         if (primitiveColorBlocks is null || !primitiveColorBlocks.Any())
@@ -50,14 +49,6 @@ public sealed class BaseColorDataSource : IContentmentDataSource
                 ?.Value<BlockListItem>(StyleSettingsAlias)
                 ?.Content
                 .Value<IEnumerable<BlockListItem>>(BaseColorsAlias);
-        }
-
-        if (primitiveColorBlocks is null || !primitiveColorBlocks.Any())
-        {
-            primitiveColorBlocks = siteSettings
-                ?.Value<BlockListItem>(LegacyDesignTokensAlias)
-                ?.Content
-                .Value<IEnumerable<BlockListItem>>(LegacyPrimitiveColorsAlias);
         }
 
         if (primitiveColorBlocks is null)

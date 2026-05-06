@@ -35,11 +35,39 @@ The Base Colours list supports two block types:
   - fields: `Name`, `Select a colour`
   - the name is the base colour key shown to semantic/style editors
 
-The canonical uSync datatype is:
+The `baseColors` property on `siteSettings` is a direct `Umbraco.BlockList` using:
 
-- `site/uSync/v17/DataTypes/SiteSettingsThemeBaseColours.config`
+- `site/uSync/v17/DataTypes/SiteSettingsThemeBaseColourItems.config`
 
-It must remain a real `Umbraco.BlockList` config. Do not reintroduce the old duplicate `SiteSettingsDesignSystemPrimitiveColorTokens.config`; uSync import fails if both files exist with the same key.
+### Spacings
+
+Spacing settings are authored directly on the `Site Settings` document under the `Theme` tab.
+
+Core properties:
+
+- `spacingXs`
+- `spacingSm`
+- `spacingMd`
+- `spacingLg`
+- `spacingXl`
+- `spacing2Xl`
+- `spacingTokens`
+
+### Typography
+
+Typography settings are authored directly on the `Site Settings` document under the `Theme` tab.
+
+Core properties:
+
+- `fontFamilySans`
+- `fontFamilyDisplay`
+- `fontSizeSm`
+- `fontSizeBase`
+- `fontSizeLg`
+- `fontSizeXl`
+- `fontSize2Xl`
+- `lineHeightTight`
+- `lineHeightBase`
 
 ### Style Settings
 
@@ -172,7 +200,7 @@ Confirmed:
 - custom colours have `Name` and eye-dropper `Select a colour`
 - block element aliases were kept as `colorToken` and `customColorToken` for Block List compatibility
 - runtime provider resolves both new `baseColors` and legacy `primitiveColors`
-- uSync duplicate datatype file issue was fixed by keeping only `SiteSettingsThemeBaseColours.config`
+- theme colour, spacing, and typography settings are authored directly on `siteSettings` without single-block wrappers
 - verification build passed using a separate output folder
 
 Current recurring warning:
@@ -206,6 +234,6 @@ Current recurring warning:
 - `site/uSync/v17/ContentTypes/customcolortoken.config`
 - `site/uSync/v17/ContentTypes/semanticcolortoken.config`
 - `site/uSync/v17/DataTypes/PrimitiveColorTokenValues.config`
-- `site/uSync/v17/DataTypes/SiteSettingsThemeBaseColours.config`
+- `site/uSync/v17/DataTypes/SiteSettingsThemeBaseColourItems.config`
 - `site/uSync/v17/DataTypes/SiteSettingsDesignSystemSemanticColorTokens.config`
 - `site/uSync/v17/DataTypes/TailwindPrimitiveColorSwatches.config`

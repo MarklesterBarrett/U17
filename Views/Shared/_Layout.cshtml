@@ -3,7 +3,15 @@
 @inject Site.DesignTokens.ISiteSettingsResolver SiteSettingsResolver
 @{
     var siteSettings = SiteSettingsResolver.GetSiteSettings(Model);
+    var siteIdentitySettings = SiteSettingsResolver.GetSiteIdentitySettings(Model);
+    var headerSettings = SiteSettingsResolver.GetHeaderSettings(Model);
+    var footerSettings = SiteSettingsResolver.GetFooterSettings(Model);
+    var themeSettings = SiteSettingsResolver.GetThemeSettings(Model);
     ViewData["SiteSettings"] = siteSettings;
+    ViewData["SiteIdentitySettings"] = siteIdentitySettings;
+    ViewData["HeaderSettings"] = headerSettings;
+    ViewData["FooterSettings"] = footerSettings;
+    ViewData["ThemeSettings"] = themeSettings;
     ViewData["TenantKey"] = Model?.Root()?.Key;
 }
 <!DOCTYPE html>
