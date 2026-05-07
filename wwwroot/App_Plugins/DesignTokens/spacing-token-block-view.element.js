@@ -37,7 +37,7 @@ class MySpacingTokenBlockView extends HTMLElement {
   render() {
     const name = this.readValue(this.content, "name") || this.readValue(this.content, "label");
     const alias = this.createSpacingAlias(name || this.readValue(this.content, "alias"));
-    const responsiveValues = this.readResponsiveValues(this.content);
+    const responsiveValues = this.resolveResponsiveValues(this.readResponsiveValues(this.content));
     const mobile = responsiveValues.mobile || "-";
     const tablet = responsiveValues.tablet || "-";
     const desktop = responsiveValues.desktop || "-";
@@ -167,6 +167,18 @@ class MySpacingTokenBlockView extends HTMLElement {
     } catch {
       return {};
     }
+  }
+
+  resolveResponsiveValues(value) {
+    const mobile = String(value?.mobile || "").trim();
+    const tablet = String(value?.tablet || "").trim() || mobile;
+    const desktop = String(value?.desktop || "").trim() || tablet;
+
+    return {
+      mobile,
+      tablet,
+      desktop,
+    };
   }
 
   createSpacingAlias(name) {

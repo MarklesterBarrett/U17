@@ -104,7 +104,7 @@ public sealed class DesignTokenStyleRenderer : IDesignTokenStyleRenderer
         }
 
         return tokens.Contains(tokenAlias)
-            ? $"var(--{tokenAlias})"
+            ? $"var(--{DesignTokenCssName.FromAlias(tokenAlias)})"
             : null;
     }
 
@@ -117,7 +117,7 @@ public sealed class DesignTokenStyleRenderer : IDesignTokenStyleRenderer
         }
 
         return tokens.Contains(tokenAlias)
-            ? $"var(--{tokenAlias})"
+            ? $"var(--{DesignTokenCssName.FromAlias(tokenAlias)})"
             : null;
     }
 

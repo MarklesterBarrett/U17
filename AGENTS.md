@@ -33,6 +33,8 @@ This repository is an Umbraco website built with plain cshtml views and Tailwind
 
 - Use a multi-layer token architecture: primitive -> alias -> semantic -> component
 - The separation between layers is intentional and must be preserved
+- For active token systems, prefer the current canonical aliases and remove legacy compatibility paths instead of adding fallback reads in code
+- Semantic and component-facing token aliases should use kebab-case unless there is an explicit documented exception in the active uSync schema
 - Maximum: 60 global tokens (defined in `:root` or theme scope)
 - New tokens require review and justification
 - Prefer reuse of existing tokens over introducing new ones

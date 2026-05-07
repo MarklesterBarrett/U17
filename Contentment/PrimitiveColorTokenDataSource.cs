@@ -10,7 +10,7 @@ namespace Site.Contentment;
 public sealed class BaseColorDataSource : IContentmentDataSource
 {
     private const string StyleSettingsAlias = "styleSettings";
-    private const string BaseColorsAlias = "baseColors";
+    private const string BaseColorsAlias = "color";
     private readonly ISiteSettingsResolver _siteSettingsResolver;
 
     public BaseColorDataSource(ISiteSettingsResolver siteSettingsResolver)
@@ -51,12 +51,15 @@ public sealed class BaseColorDataSource : IContentmentDataSource
                 .Value<IEnumerable<BlockListItem>>(BaseColorsAlias);
         }
 
-        if (primitiveColorBlocks is null)
+        if (primitiveColorBlocks is null || !primitiveColorBlocks.Any())
         {
-            return [];
+            primitiveColorBlocks = siteSettings
+                ?.Value<BlockListItem>(StyleSettingsAlias)
+                ?.Content
+                .Value<IEnumerable<BlockListItem>>(BaseColorsAlias);
         }
 
-        return primitiveColorBlocks
+        return (primitiveColorBlocks ?? Enumerable.Empty<BlockListItem>())
             .Select(x => x.Content)
             .Where(x => x is not null)
             .Select(x => new
@@ -95,10 +98,10 @@ public sealed class BaseColorDataSource : IContentmentDataSource
 
         if (!string.IsNullOrWhiteSpace(paletteAlias))
         {
-            return paletteAlias;
+            return ColorTokenAlias.ToCanonical(paletteAlias);
         }
 
-        return token.Value<string>("label")?.Trim() ?? string.Empty;
+        return ColorTokenAlias.ToCanonical(token.Value<string>("label")?.Trim() ?? string.Empty);
     }
 }
 

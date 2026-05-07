@@ -22,7 +22,7 @@ public sealed class DesignTokenCssGenerator : IDesignTokenCssGenerator
         foreach (var color in tokens.Colors.OrderBy(x => x.Alias, StringComparer.OrdinalIgnoreCase))
         {
             builder.Append("  --")
-                .Append(color.Alias)
+                .Append(DesignTokenCssName.FromAlias(color.Alias))
                 .Append(": ")
                 .Append(color.Value)
                 .AppendLine(";");
@@ -31,7 +31,7 @@ public sealed class DesignTokenCssGenerator : IDesignTokenCssGenerator
         foreach (var spacing in tokens.Spacing.OrderBy(x => x.Alias, StringComparer.OrdinalIgnoreCase))
         {
             builder.Append("  --")
-                .Append(spacing.Alias)
+                .Append(DesignTokenCssName.FromAlias(spacing.Alias))
                 .Append(": ")
                 .Append(spacing.Mobile)
                 .AppendLine(";");
@@ -40,7 +40,7 @@ public sealed class DesignTokenCssGenerator : IDesignTokenCssGenerator
         foreach (var value in tokens.Values.OrderBy(x => x.Alias, StringComparer.OrdinalIgnoreCase))
         {
             builder.Append("  --")
-                .Append(value.Alias)
+                .Append(DesignTokenCssName.FromAlias(value.Alias))
                 .Append(": ")
                 .Append(value.Value)
                 .AppendLine(";");
@@ -69,7 +69,7 @@ public sealed class DesignTokenCssGenerator : IDesignTokenCssGenerator
         foreach (var spacing in tokens.OrderBy(x => x.Alias, StringComparer.OrdinalIgnoreCase))
         {
             builder.Append("    --")
-                .Append(spacing.Alias)
+                .Append(DesignTokenCssName.FromAlias(spacing.Alias))
                 .Append(": ")
                 .Append(valueSelector(spacing))
                 .AppendLine(";");
@@ -103,7 +103,7 @@ public sealed class DesignTokenCssGenerator : IDesignTokenCssGenerator
         foreach (var value in responsiveTokens)
         {
             builder.Append("    --")
-                .Append(value.Alias)
+                .Append(DesignTokenCssName.FromAlias(value.Alias))
                 .Append(": ")
                 .Append(valueSelector(value))
                 .AppendLine(";");

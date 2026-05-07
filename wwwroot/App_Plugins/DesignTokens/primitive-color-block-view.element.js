@@ -324,7 +324,8 @@ class MyBaseColorBlockView extends HTMLElement {
     const customLabel = this.readValue(this.content, "label");
     const alias = this.normalizeAlias(paletteValue || customLabel);
     const customValue = this.readValue(this.content, "customValue");
-    const color = customValue || PRIMITIVE_COLORS[alias] || "transparent";
+    const colorLookupAlias = this.normalizePaletteAlias(paletteValue || customLabel);
+    const color = customValue || PRIMITIVE_COLORS[colorLookupAlias] || "transparent";
     const label = alias || "Select a colour";
     const editPath = this.config?.editContentPath || "";
     const content = `
@@ -402,10 +403,28 @@ class MyBaseColorBlockView extends HTMLElement {
   }
 
   normalizeAlias(value) {
+    const normalized = String(value || "")
+      .trim()
+      .replace(/^\{\{\s*/, "")
+      .replace(/\s*\}\}$/, "")
+      .toLowerCase()
+      .replace(/[\s_]+/g, "-");
+
+    if (!normalized) {
+      return "";
+    }
+
+    return normalized.startsWith("color-") ? normalized : `color-${normalized}`;
+  }
+
+  normalizePaletteAlias(value) {
     return String(value || "")
       .trim()
       .replace(/^\{\{\s*/, "")
-      .replace(/\s*\}\}$/, "");
+      .replace(/\s*\}\}$/, "")
+      .toLowerCase()
+      .replace(/[\s_]+/g, "-")
+      .replace(/^color-/, "");
   }
 
   escapeHtml(value) {
