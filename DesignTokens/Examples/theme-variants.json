@@ -1,0 +1,84 @@
+{
+  "color": {
+    "surface": {
+      "page": { "$type": "color", "$value": "#ffffff" },
+      "card": { "$type": "color", "$value": "#ffffff" }
+    },
+    "text": {
+      "default": { "$type": "color", "$value": "#111827" }
+    },
+    "brand": {
+      "primary": { "$type": "color", "$value": "#0055ff" }
+    }
+  },
+  "semantic": {
+    "action": {
+      "primary": {
+        "background": { "$type": "color", "$value": "{color.brand.primary}" },
+        "text": { "$type": "color", "$value": "#ffffff" }
+      }
+    }
+  },
+  "component": {
+    "button": {
+      "primary": {
+        "background": { "$type": "color", "$value": "{semantic.action.primary.background}" },
+        "text": { "$type": "color", "$value": "{semantic.action.primary.text}" }
+      }
+    }
+  },
+  "themes": {
+    "light": {
+      "$selector": "[data-theme=\"light\"]",
+      "color": {
+        "surface": {
+          "page": { "$type": "color", "$value": "#ffffff" }
+        }
+      }
+    },
+    "dark": {
+      "$selector": "[data-theme=\"dark\"]",
+      "color": {
+        "surface": {
+          "page": { "$type": "color", "$value": "#111827" },
+          "card": { "$type": "color", "$value": "#1f2937" }
+        },
+        "text": {
+          "default": { "$type": "color", "$value": "#f9fafb" }
+        },
+        "brand": {
+          "primary": { "$type": "color", "$value": "#60a5fa" }
+        }
+      }
+    },
+    "highContrast": {
+      "$selector": "[data-theme=\"high-contrast\"]",
+      "color": {
+        "surface": {
+          "page": { "$type": "color", "$value": "#000000" }
+        },
+        "text": {
+          "default": { "$type": "color", "$value": "#ffffff" }
+        }
+      }
+    },
+    "ocean": {
+      "$selector": "[data-theme=\"ocean\"]",
+      "color": {
+        "brand": {
+          "primary": { "$type": "color", "$value": "#0f766e" }
+        }
+      },
+      "component": {
+        "button": {
+          "primary": {
+            "background": {
+              "$type": "color",
+              "$value": "{color.brand.primary}"
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -2,99 +2,150 @@
 
 ## Project
 
-This repository is an Umbraco website built with plain cshtml views and Tailwind CSS.
+This repository is an Umbraco website built with server-rendered cshtml views and Tailwind CSS.
 
-## Core principles
+---
 
-- Must be simple, readable solutions over abstraction
-- Use plain cshtml, minimal JavaScript, and server-rendered HTML by default
-- Do not introduce React, Vue, Alpine, or client-side frameworks unless explicitly requested
-- Do not add new dependencies unless explicitly justified
-- Preserve accessible, semantic HTML
+# Decision priority
+
+When rules conflict, prioritise:
+
+1. Accessibility
+2. Simplicity
+3. Deterministic rendering
+4. Editor usability
+5. Visual consistency
+6. Developer convenience
+
+---
+
+# Core principles
+
+- Prefer simple, readable, deterministic solutions over abstraction
+- Default to server-rendered HTML with minimal JavaScript
+- Do not introduce React, Vue, Alpine, or other client-side frameworks unless explicitly requested
+- Do not add dependencies unless clearly justified
+- Preserve semantic, accessible HTML
 - Mobile-first always
-- Keep components easy for content editors to use and hard to misuse
+- Keep implementations maintainable for developers and predictable for content editors
 
-## Umbraco rules
+---
 
-- Prefer straightforward document types and compositions over clever structures
-- Use blocklist, over block grid. Refer to Mobile-first always.
-- Keep templates, partials, and view models simple
-- Avoid unnecessary wrappers and deeply nested partial chains
-- Think clean code. Avoid deep neted element.
-- Do not introduce custom property editors unless explicitly requested
-- Favour deterministic rendering over magic helpers
+# Umbraco guidelines
 
-## CSS and Tailwind rules
+- Prefer straightforward document types and compositions over complex inheritance structures
+- Prefer Block List over Block Grid unless a grid-based editorial experience is explicitly required
+- Keep templates, partials, and view models focused and shallow
+- Avoid deeply nested partial chains and unnecessary wrapper elements
+- Avoid custom property editors unless explicitly required
+- Prefer deterministic rendering over magic helpers or hidden conventions
+- Keep content modelling explicit and editor-friendly
+- Avoid introducing unnecessary abstraction layers in rendering pipelines
+
+---
+
+# Tailwind and CSS guidelines
+
+## General
 
 - Tailwind is the default styling approach
-- Use design tokens via CSS custom properties for color, spacing, type, radius, and motion
-
-### Tokens
-
-- Use a multi-layer token architecture: primitive -> alias -> semantic -> component
-- The separation between layers is intentional and must be preserved
-- For active token systems, prefer the current canonical aliases and remove legacy compatibility paths instead of adding fallback reads in code
-- Semantic and component-facing token aliases should use kebab-case unless there is an explicit documented exception in the active uSync schema
-- Maximum: 60 global tokens (defined in `:root` or theme scope)
-- New tokens require review and justification
-- Prefer reuse of existing tokens over introducing new ones
-- Define and use tokens as named semantic variables, not raw values
-- Represent design intent, not appearance
-- Use role-based names such as `color.primary` or `surface.default`, not hex values or visual descriptions
-- Store visual values as tokens for color, spacing, typography, radius, shadow, and motion
-- Reference tokens in UI definitions and reusable classes
-- Do not hardcode visual values in components
-- Maintain a single source of truth so token updates propagate globally
-- Support theming through token value switching, for example light and dark modes
-- Keep token naming consistent, semantic, and purpose-led
-
-### Token layering model
-
-- Primitives hold the raw visual values such as hex, px, rem, shadow values, and durations
-- Primitive tokens are never used directly in components or templates
-- Alias tokens map primitives into a brand or system decision layer and isolate future visual changes
-- Semantic tokens encode UI intent such as surface, text, border, action, focus, or spacing roles
-- Components may only consume semantic tokens or approved component tokens
-- Component tokens compose semantic tokens for a specific reusable UI pattern; they do not define raw values
-- Do not skip layers by binding components directly to primitives or brand aliases unless explicitly documented as an exception
-- When introducing a token, decide which layer it belongs to before adding it
-- If a token name describes appearance instead of intent, it is likely in the wrong layer
-
-### Tailwind usage
-
 - Prefer utility classes for layout and styling
-- Extract reusable classes only when the pattern repeats 3+ times or the class string becomes hard to maintain
-- Do not mix multiple near-duplicate class patterns across templates
-
-### Reusable classes
-
-- Treat reusable classes as single sources of truth
-- Define once, reuse across components
-- Interactive states (`hover`, `focus`, `active`) must be included in the reusable class definition
-
-### Custom CSS
-
+- Extract reusable classes only when:
+  - a pattern repeats 3+ times
+  - class strings become difficult to maintain
+- Avoid near-duplicate utility patterns across templates
 - Avoid custom CSS unless Tailwind or tokens cannot express the requirement clearly
-- Any custom CSS must use existing tokens
+- All custom CSS must consume existing tokens
 
-### Consistency
+## Reusable classes
 
-- Avoid ad hoc variables or one-off styling patterns
+- Reusable classes are single sources of truth
+- Define once and reuse consistently
+- Include interactive states (`hover`, `focus`, `active`) within reusable class definitions
+
+## Consistency
+
+- Avoid ad hoc variables and one-off styling patterns
 - Keep styling decisions centralised and predictable
+- Do not hardcode visual values inside components
+- Prefer composition and reuse over duplication
 
-### Breakpoints
+---
 
-- Mobile-first: 320px baseline
-- Tablet: 768px+
-- Laptop: 1024px+
-- Desktop: 1440px+
-- Responsive token values should use the keys `mobile`, `tablet`, `laptop`, and `desktop`
-- Breakpoints must align with the Tailwind configuration
+# Design token architecture
 
-## Design-token goal
+## Principles
 
-The visual identity should be transformable primarily by changing a controlled set of global CSS variables.
-These variables should cover:
+- Use CSS custom properties for all design tokens
+- Tokens should represent design intent rather than raw appearance
+- Prefer semantic naming such as:
+  - `--color-text-primary`
+  - `--surface-default`
+  - `--space-content-gap`
+- Avoid visual naming such as:
+  - `--blue-500`
+  - `--large-radius`
+
+## Token hierarchy
+
+Use the following token structure:
+
+```text
+primitive -> alias -> semantic -> component
+```
+
+### Primitive tokens
+
+Primitive tokens contain raw visual values such as:
+
+- colors
+- spacing
+- typography
+- radius
+- shadows
+- motion values
+
+Primitive tokens must never be consumed directly by components.
+
+### Alias tokens
+
+Alias tokens map primitives into brand or system-level decisions and isolate future visual changes.
+
+### Semantic tokens
+
+Semantic tokens represent UI intent, such as:
+
+- surface
+- text
+- border
+- action
+- focus
+- spacing roles
+
+Components should consume semantic tokens by default.
+
+### Component tokens
+
+Component tokens compose semantic tokens for specific reusable UI patterns.
+
+Component tokens must not define raw visual values.
+
+## Token rules
+
+- Do not skip token layers unless explicitly documented
+- Prefer existing tokens over introducing new ones
+- New global tokens require justification
+- Keep token naming semantic, consistent, and purpose-led
+- Theme switching should primarily happen through token substitution
+- Global token definitions should remain intentionally controlled and limited
+- Semantic and component-facing token aliases should use kebab-case unless explicitly documented otherwise
+- Tokens should act as the single source of truth for visual styling
+
+## Design token goals
+
+The visual identity should be primarily transformable through controlled token changes.
+
+Global tokens should cover:
 
 - color system
 - typography
@@ -105,29 +156,86 @@ These variables should cover:
 - motion
 - component surface styling
 
-Goal: enforce consistency, enable global changes, and keep design and code aligned.
+Goals:
 
-## Accessibility
+- enforce consistency
+- enable scalable theming
+- reduce styling duplication
+- keep design and implementation aligned
+
+---
+
+# Responsive design
+
+## Breakpoints
+
+Mobile-first breakpoints:
+
+- mobile: 320px+
+- tablet: 768px+
+- desktop: 1024px+
+
+
+Responsive token objects should use:
+
+```json
+{
+  "mobile": "",
+  "tablet": "",
+  "desktop": ""
+}
+```
+
+Breakpoints must align with the Tailwind configuration.
+
+## Responsive behaviour
+
+- Mobile styles are the default baseline
+- Enhance progressively for larger breakpoints
+- Avoid desktop-first overrides
+- Prefer intrinsic and fluid layouts where possible
+
+---
+
+# Accessibility
 
 - All interactive controls must be keyboard accessible
 - Maintain visible focus states
-- Use semantic heading order
-- Ensure forms have labels and error messaging
-- Avoid relying on color alone
+- Use semantic heading hierarchy
+- Forms must include labels and validation messaging
+- Do not rely solely on color to communicate meaning
+- Preserve logical tab order
+- Ensure sufficient contrast ratios
+- Prefer native HTML behaviour before ARIA enhancements
 
-## Done means
+---
 
-Before completing a task:
+# Performance and rendering
 
-- explain the plan briefly
-- make the smallest sensible change
-- keep diffs reviewable
-- run relevant verification commands if available
-- summarise changed files and any follow-up risks
+- Prefer server-side rendering over client-side rendering
+- Avoid unnecessary hydration and runtime JavaScript
+- Keep markup shallow and efficient
+- Avoid unnecessary DOM complexity
+- Optimise for maintainability before micro-optimisation
+- Prefer predictable rendering over implicit behaviour
 
-## Behaviour
+---
 
-- For non-trivial tasks, plan first before editing
-- If requirements are ambiguous, prefer the simplest implementation that matches this file
-- Do not perform broad refactors unless asked
+# Workflow expectations
+
+For non-trivial work:
+
+- Briefly explain the implementation approach before making changes
+- Make the smallest sensible change
+- Keep diffs reviewable
+- Run relevant verification commands where available
+- Summarise changed files and any notable follow-up risks
+
+---
+
+# Change boundaries
+
+- Prefer incremental change over broad refactors
 - Do not rename files or move folders unless necessary
+- If requirements are ambiguous, choose the simplest implementation aligned with this document
+- Preserve existing architectural direction unless explicitly asked to change it

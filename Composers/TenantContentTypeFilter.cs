@@ -17,12 +17,12 @@ public sealed class TenantContentTypeFilter : IContentTypeFilter
     private static readonly Guid SiteSettingsKey = new("88c20fb1-fbed-41fb-b7e7-23fa8b13db89");
     private const string TenantSiteAlias = "tenantSite";
     private const string PageAlias = "page";
-    private const string SiteSettingsAlias = "siteSettings";
-    private const string SiteIdentitySettingsAlias = "siteIdentitySettings";
-    private const string SiteHeaderSettingsAlias = "siteHeaderSettings";
-    private const string SiteFooterSettingsAlias = "siteFooterSettings";
-    private const string SiteThemeSettingsAlias = "siteThemeSettings";
-    private const string ThemeStyleRolesAlias = "themeStyleRoles";
+    private const string SiteSettingsAlias = "settings";
+    private const string SiteIdentitySettingsAlias = "settingsIdentity";
+    private const string SiteHeaderSettingsAlias = "settingsHeader";
+    private const string SiteFooterSettingsAlias = "settingsFooter";
+    private const string SiteThemeSettingsAlias = "settingsTheme";
+    private const string ThemeRolesAlias = "settingsStyles";
 
     public Task<IEnumerable<T>> FilterAllowedAtRootAsync<T>(IEnumerable<T> contentTypes)
         where T : IContentTypeComposition
@@ -54,7 +54,7 @@ public sealed class TenantContentTypeFilter : IContentTypeFilter
                 string.Equals(x.Alias, SiteHeaderSettingsAlias, StringComparison.Ordinal) ||
                 string.Equals(x.Alias, SiteFooterSettingsAlias, StringComparison.Ordinal) ||
                 string.Equals(x.Alias, SiteThemeSettingsAlias, StringComparison.Ordinal) ||
-                string.Equals(x.Alias, ThemeStyleRolesAlias, StringComparison.Ordinal));
+                string.Equals(x.Alias, ThemeRolesAlias, StringComparison.Ordinal));
 
             return Task.FromResult(filtered);
         }

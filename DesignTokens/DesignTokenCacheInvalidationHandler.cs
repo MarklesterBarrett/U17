@@ -8,7 +8,7 @@ public sealed class DesignTokenCacheInvalidationHandler :
     INotificationHandler<ContentUnpublishedNotification>,
     INotificationHandler<ContentDeletedNotification>
 {
-    private const string SiteSettingsAlias = "siteSettings";
+    private const string SiteSettingsAlias = "settings";
     private readonly IDesignTokenCssCache _cache;
 
     public DesignTokenCacheInvalidationHandler(IDesignTokenCssCache cache)

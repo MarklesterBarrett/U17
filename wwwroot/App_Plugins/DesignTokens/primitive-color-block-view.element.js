@@ -403,18 +403,7 @@ class MyBaseColorBlockView extends HTMLElement {
   }
 
   normalizeAlias(value) {
-    const normalized = String(value || "")
-      .trim()
-      .replace(/^\{\{\s*/, "")
-      .replace(/\s*\}\}$/, "")
-      .toLowerCase()
-      .replace(/[\s_]+/g, "-");
-
-    if (!normalized) {
-      return "";
-    }
-
-    return normalized.startsWith("color-") ? normalized : `color-${normalized}`;
+    return this.normalizePaletteAlias(value);
   }
 
   normalizePaletteAlias(value) {

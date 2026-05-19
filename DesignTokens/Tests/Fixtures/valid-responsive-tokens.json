@@ -1,0 +1,27 @@
+{
+  "space": {
+    "base": {
+      "$type": "dimension",
+      "$value": {
+        "value": 16,
+        "unit": "px"
+      }
+    },
+    "page": {
+      "$type": "dimension",
+      "$value": {
+        "mobile": { "value": 16, "unit": "px" },
+        "tablet": { "value": 24, "unit": "px" },
+        "desktop": { "value": 32, "unit": "px" }
+      }
+    },
+    "stack": {
+      "$type": "dimension",
+      "$value": {
+        "mobile": "{space.base}",
+        "tablet": { "value": 28, "unit": "px" },
+        "desktop": { "value": 40, "unit": "px" }
+      }
+    }
+  }
+}

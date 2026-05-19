@@ -9,8 +9,7 @@ namespace Site.Contentment;
 
 public sealed class BaseColorDataSource : IContentmentDataSource
 {
-    private const string StyleSettingsAlias = "styleSettings";
-    private const string BaseColorsAlias = "color";
+    private const string ThemeColorsAlias = "color";
     private readonly ISiteSettingsResolver _siteSettingsResolver;
 
     public BaseColorDataSource(ISiteSettingsResolver siteSettingsResolver)
@@ -20,7 +19,7 @@ public sealed class BaseColorDataSource : IContentmentDataSource
 
     public string Name => "Base Colours";
 
-    public string Description => "Reads base colours from site settings.";
+    public string Description => "Reads base colours from Theme Settings.";
 
     public string Icon => "icon-colorpicker";
 
@@ -35,29 +34,7 @@ public sealed class BaseColorDataSource : IContentmentDataSource
     public IEnumerable<DataListItem> GetItems(Dictionary<string, object> config)
     {
         var themeSettings = _siteSettingsResolver.GetThemeSettings();
-        var siteSettings = _siteSettingsResolver.GetSiteSettings();
-        var primitiveColorBlocks = themeSettings?.Value<IEnumerable<BlockListItem>>(BaseColorsAlias);
-
-        if (primitiveColorBlocks is null || !primitiveColorBlocks.Any())
-        {
-            primitiveColorBlocks = siteSettings?.Value<IEnumerable<BlockListItem>>(BaseColorsAlias);
-        }
-
-        if (primitiveColorBlocks is null || !primitiveColorBlocks.Any())
-        {
-            primitiveColorBlocks = siteSettings
-                ?.Value<BlockListItem>(StyleSettingsAlias)
-                ?.Content
-                .Value<IEnumerable<BlockListItem>>(BaseColorsAlias);
-        }
-
-        if (primitiveColorBlocks is null || !primitiveColorBlocks.Any())
-        {
-            primitiveColorBlocks = siteSettings
-                ?.Value<BlockListItem>(StyleSettingsAlias)
-                ?.Content
-                .Value<IEnumerable<BlockListItem>>(BaseColorsAlias);
-        }
+        var primitiveColorBlocks = themeSettings?.Value<IEnumerable<BlockListItem>>(ThemeColorsAlias);
 
         return (primitiveColorBlocks ?? Enumerable.Empty<BlockListItem>())
             .Select(x => x.Content)
@@ -98,10 +75,10 @@ public sealed class BaseColorDataSource : IContentmentDataSource
 
         if (!string.IsNullOrWhiteSpace(paletteAlias))
         {
-            return ColorTokenAlias.ToCanonical(paletteAlias);
+            return ColorTokenAlias.ToLegacy(paletteAlias);
         }
 
-        return ColorTokenAlias.ToCanonical(token.Value<string>("label")?.Trim() ?? string.Empty);
+        return ColorTokenAlias.ToLegacy(token.Value<string>("label")?.Trim() ?? string.Empty);
     }
 }
 

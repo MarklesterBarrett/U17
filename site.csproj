@@ -32,4 +32,11 @@
     <RazorCompileOnPublish>false</RazorCompileOnPublish>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Content Remove="artifacts\**" />
+    <Content Remove="bin-temp\**" />
+    <None Remove="artifacts\**" />
+    <None Remove="bin-temp\**" />
+  </ItemGroup>
+
 </Project>

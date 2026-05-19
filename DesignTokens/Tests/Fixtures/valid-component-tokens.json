@@ -1,0 +1,29 @@
+{
+  "color": {
+    "brand": {
+      "primary": { "$type": "color", "$value": "#0055ff" }
+    }
+  },
+  "semantic": {
+    "action": {
+      "primary": {
+        "background": { "$type": "color", "$value": "{color.brand.primary}" },
+        "text": { "$type": "color", "$value": "#ffffff" }
+      }
+    }
+  },
+  "component": {
+    "button": {
+      "primary": {
+        "background": {
+          "$type": "color",
+          "$value": "{semantic.action.primary.background}"
+        },
+        "text": {
+          "$type": "color",
+          "$value": "{semantic.action.primary.text}"
+        }
+      }
+    }
+  }
+}

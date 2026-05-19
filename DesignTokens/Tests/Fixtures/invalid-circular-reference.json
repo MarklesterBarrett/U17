@@ -1,0 +1,14 @@
+{
+  "color": {
+    "brand": {
+      "primary": {
+        "$type": "color",
+        "$value": "{color.brand.secondary}"
+      },
+      "secondary": {
+        "$type": "color",
+        "$value": "{color.brand.primary}"
+      }
+    }
+  }
+}

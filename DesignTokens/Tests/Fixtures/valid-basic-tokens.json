@@ -1,0 +1,59 @@
+{
+  "color": {
+    "brand": {
+      "primary": {
+        "$type": "color",
+        "$value": "#0055ff"
+      }
+    }
+  },
+  "space": {
+    "md": {
+      "$type": "dimension",
+      "$value": {
+        "value": 24,
+        "unit": "px"
+      }
+    }
+  },
+  "font": {
+    "family": {
+      "sans": {
+        "$type": "fontFamily",
+        "$value": "Inter, Arial, sans-serif"
+      }
+    },
+    "weight": {
+      "regular": {
+        "$type": "fontWeight",
+        "$value": 400
+      }
+    }
+  },
+  "motion": {
+    "fast": {
+      "$type": "duration",
+      "$value": {
+        "value": 150,
+        "unit": "ms"
+      }
+    }
+  },
+  "opacity": {
+    "disabled": {
+      "$type": "number",
+      "$value": 0.5
+    }
+  },
+  "typography": {
+    "body": {
+      "$type": "typography",
+      "$value": {
+        "fontFamily": "{font.family.sans}",
+        "fontWeight": "{font.weight.regular}",
+        "fontSize": { "value": 16, "unit": "px" },
+        "lineHeight": 1.5
+      }
+    }
+  }
+}

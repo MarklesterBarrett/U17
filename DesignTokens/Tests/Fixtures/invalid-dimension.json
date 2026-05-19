@@ -1,0 +1,11 @@
+{
+  "space": {
+    "md": {
+      "$type": "dimension",
+      "$value": {
+        "value": 24,
+        "unit": "potato"
+      }
+    }
+  }
+}

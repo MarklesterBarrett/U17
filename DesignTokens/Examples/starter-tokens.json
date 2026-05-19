@@ -1,0 +1,104 @@
+{
+  "color": {
+    "brand": {
+      "primary": {
+        "$type": "color",
+        "$value": "#0055ff"
+      },
+      "secondary": {
+        "$type": "color",
+        "$value": "#111827"
+      }
+    },
+    "surface": {
+      "page": {
+        "$type": "color",
+        "$value": "#ffffff"
+      }
+    }
+  },
+  "space": {
+    "md": {
+      "$type": "dimension",
+      "$value": {
+        "value": 24,
+        "unit": "px"
+      }
+    },
+    "page": {
+      "$type": "dimension",
+      "$value": {
+        "mobile": { "value": 16, "unit": "px" },
+        "tablet": { "value": 24, "unit": "px" },
+        "desktop": { "value": 32, "unit": "px" }
+      }
+    }
+  },
+  "font": {
+    "family": {
+      "sans": {
+        "$type": "fontFamily",
+        "$value": "Inter, Arial, sans-serif"
+      }
+    },
+    "weight": {
+      "regular": {
+        "$type": "fontWeight",
+        "$value": 400
+      },
+      "bold": {
+        "$type": "fontWeight",
+        "$value": 700
+      }
+    }
+  },
+  "motion": {
+    "fast": {
+      "$type": "duration",
+      "$value": {
+        "value": 150,
+        "unit": "ms"
+      }
+    }
+  },
+  "opacity": {
+    "disabled": {
+      "$type": "number",
+      "$value": 0.5
+    }
+  },
+  "typography": {
+    "body": {
+      "$type": "typography",
+      "$value": {
+        "fontFamily": "{font.family.sans}",
+        "fontWeight": "{font.weight.regular}",
+        "fontSize": { "value": 16, "unit": "px" },
+        "lineHeight": 1.5,
+        "letterSpacing": { "value": 0, "unit": "" }
+      }
+    }
+  },
+  "shadow": {
+    "card": {
+      "$type": "shadow",
+      "$value": {
+        "color": "#00000022",
+        "offsetX": { "value": 0, "unit": "px" },
+        "offsetY": { "value": 6, "unit": "px" },
+        "blur": { "value": 16, "unit": "px" },
+        "spread": { "value": 0, "unit": "" }
+      }
+    }
+  },
+  "border": {
+    "default": {
+      "$type": "border",
+      "$value": {
+        "width": { "value": 1, "unit": "px" },
+        "style": "solid",
+        "color": "{color.brand.secondary}"
+      }
+    }
+  }
+}

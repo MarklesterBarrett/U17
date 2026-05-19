@@ -1,0 +1,25 @@
+{
+  "$schema": "../../umbraco-package-schema.json",
+  "name": "Site.SubsidiarySiteGenerator",
+  "version": "1.0.0",
+  "extensions": [
+    {
+      "type": "sectionView",
+      "alias": "Site.SectionView.SubsidiarySiteGenerator",
+      "name": "Subsidiary Site Generator",
+      "element": "/App_Plugins/SubsidiarySiteGenerator/subsidiary-site-generator.element.js",
+      "elementName": "site-subsidiary-site-generator",
+      "meta": {
+        "icon": "icon-add",
+        "label": "Site Generator",
+        "pathname": "site-generator"
+      },
+      "conditions": [
+        {
+          "alias": "Umb.Condition.SectionAlias",
+          "match": "Umb.Section.Content"
+        }
+      ]
+    }
+  ]
+}

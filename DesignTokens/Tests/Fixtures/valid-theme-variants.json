@@ -1,0 +1,17 @@
+{
+  "color": {
+    "surface": {
+      "page": { "$type": "color", "$value": "#ffffff" }
+    }
+  },
+  "themes": {
+    "dark": {
+      "$selector": "[data-theme=\"dark\"]",
+      "color": {
+        "surface": {
+          "page": { "$type": "color", "$value": "#111827" }
+        }
+      }
+    }
+  }
+}

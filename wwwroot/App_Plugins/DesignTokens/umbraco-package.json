@@ -4,6 +4,34 @@
   "version": "1.0.5",
   "extensions": [
     {
+      "type": "sectionView",
+      "alias": "Site.SectionView.DesignTokenManager",
+      "name": "Theme Workbench",
+      "element": "/App_Plugins/DesignTokens/design-token-manager.element.js",
+      "elementName": "site-design-token-manager",
+      "meta": {
+        "icon": "icon-brackets",
+        "label": "Theme Workbench",
+        "pathname": "design-tokens"
+      },
+      "conditions": [
+        {
+          "alias": "Umb.Condition.SectionAlias",
+          "match": "Umb.Section.Settings"
+        },
+        {
+          "alias": "Umb.Condition.CurrentUser.IsAdmin"
+        }
+      ]
+    },
+    {
+      "type": "modal",
+      "alias": "Site.Modal.FoundationColorToken",
+      "name": "Foundation Color Token Modal",
+      "element": "/App_Plugins/DesignTokens/foundation-color-token-modal.element.js",
+      "elementName": "site-foundation-color-token-modal"
+    },
+    {
       "type": "propertyEditorUi",
       "alias": "My.PropertyEditorUi.Contentment.ColorSwatches",
       "name": "Contentment Color Swatches",

@@ -484,3 +484,6 @@ umbraco-package-schema.json
 
 # Temporary alternate build output used for local verification
 /bin-temp/
+
+# Generated site output
+/wwwroot/generated-sites/

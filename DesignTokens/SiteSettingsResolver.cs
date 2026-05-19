@@ -29,12 +29,12 @@ public interface ISiteSettingsResolver
 
 public sealed class SiteSettingsResolver : ISiteSettingsResolver
 {
-    private const string SiteSettingsAlias = "siteSettings";
-    private const string SiteIdentitySettingsAlias = "siteIdentitySettings";
-    private const string HeaderSettingsAlias = "siteHeaderSettings";
-    private const string FooterSettingsAlias = "siteFooterSettings";
-    private const string ThemeSettingsAlias = "siteThemeSettings";
-    private const string SemanticThemeTokensAlias = "themeStyleRoles";
+    private const string SiteSettingsAlias = "settings";
+    private const string SiteIdentitySettingsAlias = "settingsIdentity";
+    private const string HeaderSettingsAlias = "settingsHeader";
+    private const string FooterSettingsAlias = "settingsFooter";
+    private const string ThemeSettingsAlias = "settingsTheme";
+    private const string SemanticThemeTokensAlias = "settingsStyles";
     private readonly IServiceScopeFactory _serviceScopeFactory;
     private readonly IUmbracoContextAccessor _umbracoContextAccessor;
 
